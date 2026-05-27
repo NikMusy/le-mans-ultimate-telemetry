@@ -1,5 +1,7 @@
 # LMU PIT WALL
 
+> 🌐 **Language:** **English** · [Русский](README.ru.md)
+
 > WEC-style real-time telemetry dashboard for **Le Mans Ultimate** (rFactor 2 engine).
 > Built for endurance racing — your remote strategist watches the same data as a real pit-wall engineer.
 
@@ -116,11 +118,13 @@ A `⚙ CONNECTION` button in the footer lets them change it at any time.
 
 ### For the strategist
 
-A complete operating manual lives in
-[**STRATEGIST_GUIDE.md**](STRATEGIST_GUIDE.md) (Russian). It covers the
-screen layout, tire-colour cheat sheet, lap-time colour code, 7 typical
-race scenarios and what to radio in each, troubleshooting, and a pit
-journal template. Send it to your engineer before the race.
+A complete operating manual lives in two languages:
+[**STRATEGIST_GUIDE.md**](STRATEGIST_GUIDE.md) (English) /
+[**STRATEGIST_GUIDE.ru.md**](STRATEGIST_GUIDE.ru.md) (Russian). Each
+covers the screen layout, tire-colour cheat sheet, lap-time colour code,
+7 typical race scenarios and what to radio in each, troubleshooting, and
+a pit journal template. Send the right language to your engineer before
+the race.
 
 Inside the dashboard, the `? GUIDE` button (footer) opens an in-app
 condensed version of the same cheat sheet — strategist never has to leave
@@ -181,9 +185,14 @@ le-mans-ultimate-telemetry/
 ├── server.py                 # FastAPI + ctypes SMMP reader + WebSocket stream
 ├── static/
 │   └── index.html            # Monolithic frontend (HTML + CSS + JS)
-├── .gitignore
+├── package.json              # npm scripts for wrangler deploy
+├── wrangler.toml             # Cloudflare Pages config
+├── STRATEGIST_GUIDE.md       # Full strategist manual (English)
+├── STRATEGIST_GUIDE.ru.md    # Full strategist manual (Russian)
+├── README.md                 # This file (English)
+├── README.ru.md              # This file (Russian)
 ├── LICENSE
-└── README.md
+└── .gitignore
 ```
 
 ## Tuning

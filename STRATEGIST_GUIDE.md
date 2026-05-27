@@ -1,20 +1,22 @@
-# LMU PIT WALL — гайд для стратега
+> 🌐 **Language:** **English** · [Русский](STRATEGIST_GUIDE.ru.md)
 
-Это инструкция для **инженера-стратега**, который удалённо следит за гонкой пилота в Le Mans Ultimate. Технических навыков не требуется. Прочитай один раз — потом используешь как шпаргалку.
+# LMU PIT WALL — Strategist Guide
+
+This is the operating manual for the **race engineer / strategist** watching a Le Mans Ultimate driver remotely. No technical background required. Read it once — then keep it as a cheat sheet.
 
 ---
 
-## Что тебе нужно перед стартом
+## What you need before the start
 
-- **Большой монитор** — минимум 1920×1080, идеально 2560×1440. Дашборд оптимизирован под 4 колонки.
-- **Браузер Chrome или Edge** (Firefox тоже ок). Safari не рекомендуется — бывают проблемы с WebSocket.
-- **Гарнитура** — голосовая связь с пилотом (Discord, TeamSpeak — что договорились).
-- **Стабильный интернет** — поток данных постоянный, но скромный (~10 КБ/сек).
-- **Ссылка от пилота** — две части:
-  - Базовый URL: `https://lmu-pitwall.pages.dev/`
-  - Параметр WebSocket: `?ws=wss://<...>.trycloudflare.com/ws` или `?ws=wss://<...>.ngrok-free.app/ws`
+- **Large monitor** — 1920×1080 minimum, 2560×1440 ideal. The dashboard is designed around a 4-column layout.
+- **Browser: Chrome or Edge** (Firefox works too). Safari is not recommended — WebSocket issues.
+- **Headset** — voice link with the driver (Discord, TeamSpeak — whatever you agreed on).
+- **Stable internet** — the stream is constant but light (~10 KB/s).
+- **Link from the driver** — two parts:
+  - Base URL: `https://lmu-pitwall.pages.dev/`
+  - WebSocket parameter: `?ws=wss://<...>.trycloudflare.com/ws` or `?ws=wss://<...>.ngrok-free.app/ws`
 
-Пилот пришлёт **готовую склеенную ссылку**. Может выглядеть так:
+The driver sends you the **complete glued URL**. Looks like this:
 
 ```
 https://lmu-pitwall.pages.dev/?ws=wss://bean-turbo-paxil-wal.trycloudflare.com/ws
@@ -22,236 +24,237 @@ https://lmu-pitwall.pages.dev/?ws=wss://bean-turbo-paxil-wal.trycloudflare.com/w
 
 ---
 
-## Подключение за 3 шага
+## Connect in 3 steps
 
-### 1. Открой ссылку
-Открой в браузере. Через 1-2 секунды должен загрузиться дашборд. Если видишь чёрный экран — обнови страницу (`Ctrl+R`).
+### 1. Open the link
+Open it in the browser. After 1-2 seconds the dashboard should load. Black screen? Reload (`Ctrl+R`).
 
-### 2. Проверь подключение
-Внизу слева в подвале — индикатор:
-- 🟢 **CONNECTED** — связь с сервером пилота установлена.
-- 🔴 **DISCONNECTED** — связи нет. Проверь интернет и пингани пилота: жив ли его cloudflared/ngrok.
+### 2. Check the connection
+Bottom-left of the footer — status LED:
+- 🟢 **CONNECTED** — link to the driver's server is established.
+- 🔴 **DISCONNECTED** — no link. Check your internet, then ping the driver: is their cloudflared/ngrok window alive?
 
-Если поверх дашборда — модалка **AWAITING TELEMETRY** жёлтым → пилот в гараже или меню. Это нормально, начнёт показывать как только он выедет на трассу.
+If a yellow **AWAITING TELEMETRY** modal sits over the dashboard → the driver is in the garage or menu. Normal — data will flow the moment they go on track.
 
-### 3. F11 — полноэкранный режим
-Сразу нажми **F11** — браузер уберёт верхнюю панель, дашборд развернётся на весь монитор. Выход — снова F11.
+### 3. F11 — full-screen mode
+Press **F11** right away — the browser drops its chrome and the dashboard fills the monitor. Exit: F11 again.
 
-### Если ссылка протухла (URL у пилота поменялся)
-Внизу справа есть кнопка **⚙ CONNECTION**. Нажми — откроется окно с полем для нового WebSocket URL. Вставь новый адрес от пилота, нажми **SAVE & RECONNECT**. Запомнится в браузере, в следующий раз вводить не надо.
+### If the URL gets stale (driver's tunnel restarted)
+Bottom-right of the footer: **⚙ CONNECTION** button. Click it — a modal opens with a field for the new WebSocket URL. Paste the new address from the driver, click **SAVE & RECONNECT**. It's remembered in your browser; next time you don't need to enter it.
 
 ---
 
-## Раскладка экрана
+## Screen layout
 
 ```
 ┌────────────────────────────────────────────────────────────────────┐
-│  [HEADER] ● трек · машина · пилот · класс · погода · сесс. время   │
+│  [HEADER] ● track · car · driver · class · weather · session clock │
 ├──────────────┬─────────────┬──────────────┬────────────────────────┤
 │              │             │              │                        │
 │   VITALS     │   TIRES     │   TIMING     │   CLASSES + MAP        │
-│  (вживую,    │ (4 шины,    │ (позиции,    │ (все машины поля,      │
-│   60 раз/сек)│  температуры│  лап-таймы,  │  карта трассы)         │
-│              │  и пр.)     │  сектора)    │                        │
+│  (live, 60   │ (4 wheels,  │ (position,   │ (whole field, live     │
+│   per sec)   │  temps,     │  lap times,  │  track map)            │
+│              │  pressures) │  sectors)    │                        │
 │              ├─────────────┤              │                        │
 │              │  CAR STATUS │              │                        │
-│              │ (топливо,   │              │                        │
-│              │  вода, масло│              │                        │
+│              │ (fuel,      │              │                        │
+│              │  water, oil)│              │                        │
 └──────────────┴─────────────┴──────────────┴────────────────────────┘
-│  [FOOTER] статус · латенси · ⚙ CONNECTION · IP · локальное время   │
+│  [FOOTER] status · latency · ⚙ CONNECTION · ? GUIDE · local time   │
 └────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Что значит каждый блок
+## What every block means
 
-### Колонка 1 — VITALS (как руль пилота)
+### Column 1 — VITALS (driver's steering wheel view)
 
-| Что | Что значит | Когда говорить |
+| Element | What it means | When to call it |
 |---|---|---|
-| **Огромная цифра передачи** | На какой передаче едет (R — задняя, N — нейтраль) | Если N на трассе долго — что-то сломалось |
-| **Полоса RPM** (20 светодиодов) | Обороты двигателя. Зелёные → жёлтые → красные | Когда вся полоса красная и мигает — пилот близко к отсечке |
-| **THROTTLE / BRAKE / CLUTCH** (вертикальные полоски) | В реальном времени — % нажатия педали | Видно паттерн торможения: ранний/поздний/трейл-брейкинг |
-| **STEERING** (полоса с центром) | Положение руля. Cyan вправо — поворот направо | Слежение за корректировками на длинных поворотах |
-| **SPD KM/H** | Скорость в км/ч | На прямых — пиковая скорость; сравнение с конкурентами |
+| **Huge gear digit** | Current gear (R = reverse, N = neutral) | If N on track for long — something broke |
+| **RPM bar** (20 shift-lights) | Engine RPM. Green → yellow → red | All red + blinking — driver near rev limiter |
+| **THROTTLE / BRAKE / CLUTCH** (vertical bars) | Real-time pedal % | Reveals braking pattern: early/late/trail-braking |
+| **STEERING** (centered bar) | Steering position. Cyan right = turning right | Watch for input corrections in long corners |
+| **SPD KM/H** | Speed in km/h | Top speed on straights; compare with rivals |
 
-### Колонка 2 — TIRES (шины)
+### Column 2 — TIRES
 
-4 квадрата: FL (передняя левая), FR (передняя правая), RL (задняя левая), RR (задняя правая).
+4 squares: FL (front-left), FR (front-right), RL (rear-left), RR (rear-right).
 
-**Цвет шины** — это температура корда:
+**Tire colour** = carcass temperature:
 
-| Цвет | Температура | Что это значит |
+| Colour | Range | Meaning |
 |---|---|---|
-| 🟦 Тёмно-синий | <60 °C | Холодные, нет сцепления — НЕ АТАКОВАТЬ |
-| 🔵 Светло-синий | 60-80 °C | Разогреваются, можно поджимать |
-| 🟢 Зелёный | 80-100 °C | **Оптимум** — максимальный grip |
-| 🟡 Жёлтый | 100-115 °C | На грани, осторожно |
-| 🔴 Красный | >115 °C | **Перегрев** — деградация, потеря сцепления, риск пузырей |
+| 🟦 Dark blue | < 60 °C | Cold, no grip — DO NOT ATTACK |
+| 🔵 Blue | 60-80 °C | Warming up, building grip |
+| 🟢 Green | 80-100 °C | **Optimum** — peak grip |
+| 🟡 Yellow | 100-115 °C | On the limit, careful |
+| 🔴 Red | > 115 °C | **Overheat** — degradation, blistering risk |
 
-Цвета внутри одной шины (3 сегмента) показывают распределение: внутренняя / середина / внешняя сторона. Если внутренняя кромка красная, а внешняя зелёная — слишком много развала или агрессивные повороты в одну сторону.
+Colours within a single tire (3 segments) show distribution: inner / center / outer shoulder. Inner edge red and outer green = too much camber or aggressive one-way corners.
 
-Под цифрой температуры — мелкие данные:
-- **PSI** — давление, в psi и кПа.
-- **BRK** — температура тормозного диска (>600 °C = критично для GT3).
-- **CARCASS** — температура каркаса (растёт медленнее, важна для долгого стинта).
-- **WEAR** — % оставшегося протектора. 100% = новая, 0% = под корд.
+Below the temperature digit, small data:
+- **PSI** — pressure, in psi and kPa.
+- **BRK** — brake disc temperature (> 600 °C is critical for GT3).
+- **CARCASS** — carcass temperature (rises slowly, matters for long stints).
+- **WEAR** — % of tread remaining. 100% = new, 0% = down to the cords.
 
-**Когда говорить пилоту:**
-- Все 4 шины красные → «Manage tires, lift early».
-- Только одна красная (обычно задняя) → «You're sliding the rear, smooth throttle».
-- Все 4 синие после 3 кругов → «Push harder, tires not up to temp».
-- Wear < 30% за 10 кругов до конца стинта → «Shave for 3 laps then box».
+**When to radio the driver:**
+- All 4 red → "Manage tires, lift early."
+- Just one red (usually rear) → "You're sliding the rear, smooth throttle."
+- All 4 blue after 3 laps → "Push harder, tires not up to temp."
+- Wear < 30% with 10 laps to go in the stint → "Shave for 3 laps then box."
 
-### Колонка 3 — CAR STATUS (топливо, темпы)
+### Column 3 — CAR STATUS (fuel, temps)
 
-- **FUEL** — литры в баке. Цвет:
-  - 🟡 Жёлтый — норма.
-  - 🟠 Оранжевый — осталось <25 л (≈5 кругов на Hypercar).
-  - 🔴 Красный + мигает — <10 л, **срочный пит**.
-- Снизу: `XX.X L/LAP · YY LEFT` — расход на круг (берётся автоматом за последние 5 кругов) и сколько кругов осталось.
-- **WATER** — температура охлаждения. Норма <100 °C. Жёлтый 100-108 °C. Красный >108 °C — двигатель на грани.
-- **OIL** — температура масла. Норма <120 °C. Красный >130 °C — пит немедленно.
-- **STINT** — сколько кругов проехал в текущем стинте.
-- Сверху-справа: **TURBO X.XX BAR** — давление наддува (LMDh/LMH).
+- **FUEL** — litres in the tank. Colour:
+  - 🟡 Yellow — normal.
+  - 🟠 Orange — under 25 L (~5 laps on a Hypercar).
+  - 🔴 Red + blinking — under 10 L, **urgent pit**.
+- Below: `XX.X L/LAP · YY LEFT` — fuel per lap (auto-averaged over the last 5 laps) and laps remaining.
+- **WATER** — coolant temperature. Normal < 100 °C. Yellow 100-108 °C. Red > 108 °C — engine on the edge.
+- **OIL** — oil temperature. Normal < 120 °C. Red > 130 °C — pit immediately.
+- **STINT** — laps done in the current stint.
+- Top-right: **TURBO X.XX BAR** — boost pressure (LMDh/LMH).
 
-### Колонка 4 — TIMING TOWER
+### Column 4 — TIMING TOWER
 
-#### Верх: POSITION + LAP
-Гигантские цифры. Если **POSITION жёлтая** — пилот в пит-лейне.
+#### Top: POSITION + LAP
+Giant digits. If **POSITION is yellow** — the driver is in pit lane.
 
 #### LAP TIMES
-| Цвет | Что |
+| Colour | Meaning |
 |---|---|
-| Cyan (голубой) | Текущий круг, бежит вверх |
-| Белый | Последний завершённый круг |
-| **Magenta (фиолет)** | Лучший круг в сессии |
+| Cyan | Current lap, running up |
+| White | Last completed lap |
+| **Magenta** | Best lap of the session |
 
-Под лучшим: `LAST Δ +0.342` — насколько последний круг хуже/лучше лучшего.
+Under the best: `LAST Δ +0.342` — how much the last lap was worse/better than the best.
 
-#### SECTORS (таблица 4 строки × 3 сектора)
-| Строка | Что показывает |
+#### SECTORS (4 rows × 3 sectors)
+| Row | What |
 |---|---|
-| CUR | Текущие времена секторов (заполняются по мере прохождения круга) |
-| LAST | Последний завершённый круг по секторам |
-| BEST | Лучший круг по секторам (magenta) |
-| DELTA | Разница LAST минус BEST. Зелёный = улучшил, magenta = потерял |
+| CUR | Current sector times (fill in as the lap progresses) |
+| LAST | Last completed lap split by sector |
+| BEST | Best lap split by sector (magenta) |
+| DELTA | LAST minus BEST. Green = improved, magenta = lost |
 
-Активный сектор (где пилот сейчас) подсвечен cyan.
+The active sector (where the driver is right now) is highlighted cyan.
 
 #### GAPS
-- **AHEAD** — отрыв до машины впереди (отрицательное, зелёное).
-- **LEADER** — отставание от лидера (отрицательное, зелёное).
-- **STOPS** — сколько пит-стопов сделал пилот.
-- **PEN** — штрафы.
+- **AHEAD** — gap to the car in front (negative, green).
+- **LEADER** — gap behind the overall leader (negative, green).
+- **STOPS** — number of pit stops the driver has made.
+- **PEN** — penalties.
 
-#### FLAG STRIP (внизу таблицы)
-Лампочки — текущие предупреждения:
-- **LIVE** — данные текут (зелёный = всё ок).
-- **PIT** — пилот в пит-лейне.
-- **SPDLIM** — включил ограничитель скорости пит-лейна.
-- **OVHEAT** — двигатель перегревается (красный мигает).
-- **FUEL!** — критически мало топлива.
-- **YELLOW** — жёлтый флаг на трассе.
+#### FLAG STRIP (bottom of the tower)
+Lights = current warnings:
+- **LIVE** — data flowing (green = all good).
+- **PIT** — driver in pit lane.
+- **SPDLIM** — pit lane speed limiter active.
+- **OVHEAT** — engine overheating (red blink).
+- **FUEL!** — critically low fuel.
+- **YELLOW** — yellow flag on track.
 
-### Колонка 5 — CLASSES + MAP (мультикласс)
+### Column 5 — CLASSES + MAP (multiclass)
 
-#### CLASSES (таблица всех машин)
+#### CLASSES (full field table)
 
-Машины сгруппированы по классу с цветными свотчами:
+Cars bucketed by class with colour swatches:
 - 🔴 **Hypercar** / LMH / LMDh
 - 🔵 **LMP2** / LMP3
 - 🟡 **LMGT3** / GT3 / GTE
 
-В каждой группе строки:
+Within each group, rows show:
 ```
-[свотч] [overall place] [P в классе] [DRIVER NAME] [+gap]
+[swatch] [overall place] [P in class] [DRIVER NAME] [+gap]
 ```
 
-- Твоя машина — **строка с cyan-подсветкой**.
-- Если у конкурента появилась пометка `PIT` амбером — он сейчас на пит-стопе (возможность отыграть позицию).
-- Gaps: `LEAD` для лидера класса, `+12.3` сек до лидера, `+1L` если отстал на круг.
+- Your car — **cyan-highlighted row**.
+- If a rival has a `PIT` tag in amber — they're in the pit lane (opportunity to gain a position).
+- Gaps: `LEAD` for class leader, `+12.3` seconds to leader, `+1L` if lapped.
 
-#### TRACK MAP (карта трассы)
+#### TRACK MAP
 
-Canvas снизу. Контур трассы — серая линия. Точки — все машины в реальном времени, цвет по классу. **Твой пилот — cyan-перекрестье в центре круга-целеуказателя.**
+Canvas at the bottom. The grey line is the track outline. The dots are every car live, coloured by class. **Your driver = cyan crosshair in the center of a targeting ring.**
 
-- В первые 30-90 секунд гонки карта неполная — собирается из позиций пилота. После первого полного круга контур замкнётся, дальше стабильно.
-- Если конкурент в пите — точка тускнеет и обводится амбером.
-- Внизу: длина круга, число точек в trail, % круга пилота.
+- First 30-90 seconds of the race the map is incomplete — it builds from the driver's positions. After the first complete lap, the outline closes and is stable thereafter.
+- A rival in the pits — dot dims and gets an amber outline.
+- Bottom: track length, points in the trail, driver's current lap %.
 
 ---
 
-## 7 типичных сценариев — что говорить пилоту
+## 7 typical scenarios — what to radio
 
-### Сценарий 1: Топливо заканчивается
-- FUEL стал оранжевым → **«Pit window opens in 3 laps, fuel.»**
-- FUEL стал красным и мигает → **«Box this lap, fuel critical.»**
+### Scenario 1: Running out of fuel
+- FUEL turned orange → **"Pit window opens in 3 laps, fuel."**
+- FUEL red + blinking → **"Box this lap, fuel critical."**
 
-### Сценарий 2: Шины деградируют
-- Все 4 шины жёлтые / WEAR упал ниже 40 % → **«Manage tires, save the rears.»**
-- Красные → **«Tires gone, box for fresh set.»**
+### Scenario 2: Tires degrading
+- All 4 tires yellow / WEAR below 40% → **"Manage tires, save the rears."**
+- Red → **"Tires gone, box for fresh set."**
 
-### Сценарий 3: Двигатель греется
-- WATER >105 °C → **«Engine hot, lift on straights for 1 lap.»**
-- OIL >130 °C → **«Box immediately, oil critical.»**
+### Scenario 3: Engine overheating
+- WATER > 105 °C → **"Engine hot, lift on straights for 1 lap."**
+- OIL > 130 °C → **"Box immediately, oil critical."**
 
-### Сценарий 4: Догоняет более быстрый класс (blue flag situation)
-- На MAP видишь красную точку (Hypercar) приближается к жёлтой (твой GT3) сзади → **«Hypercar 5 seconds behind, blue flag coming.»**
-- Когда обогнал → **«Track ahead is clear, push.»**
+### Scenario 4: Faster class catching (blue flag situation)
+- On the MAP you see a red dot (Hypercar) approaching the yellow one (your GT3) from behind → **"Hypercar 5 seconds behind, blue flag coming."**
+- After they pass → **"Track ahead is clear, push."**
 
-### Сценарий 5: Конкурент по позиции в пите
-- В CLASSES рядом машина с тегом PIT → **«P2 in pit, you gain position next sector.»**
+### Scenario 5: Direct rival pits
+- In CLASSES the adjacent row shows a PIT tag → **"P2 in pit, you gain position next sector."**
 
-### Сценарий 6: Тренд кругов падает
-- LAP TIMES: BEST 1:32.4, LAST 1:33.8 уже 3 круга подряд → **«Pace dropping 1.4 sec, tires going, plan stop in 4 laps.»**
+### Scenario 6: Lap-time trend dropping
+- LAP TIMES: BEST 1:32.4, LAST 1:33.8 for 3 laps running → **"Pace dropping 1.4 sec, tires going, plan stop in 4 laps."**
 
-### Сценарий 7: Окно пит-стопа
-- На основе FUEL_LEFT и lap_count посчитай: «через сколько кругов нужен дозалив». В дашборде это уже считается (поле `YY LEFT` под FUEL). Когда подходит → **«Pit window: 6-8 laps to box.»**
+### Scenario 7: Pit window
+- From FUEL_LEFT and lap_count work out: "how many laps until refuel". The dashboard already shows this under FUEL as `YY LEFT`. When the window approaches → **"Pit window: 6-8 laps to box."**
 
 ---
 
-## Если что-то сломалось
+## If something breaks
 
-| Что видишь | Что значит | Что делать |
+| What you see | What it means | What to do |
 |---|---|---|
-| Жёлтая модалка **AWAITING TELEMETRY** | Пилот в гараже / меню / лоадинге | Это нормально, ждать. Если >5 минут — спроси пилота. |
-| Красная модалка **AWAITING SERVER** | Связи с сервером пилота нет | Спроси пилота — живёт ли его cloudflared/ngrok окно. Возможно перезапуск. |
-| Красная **CANNOT REACH SERVER** | URL устарел (пилот перезапустил туннель) | Нажми ⚙ → введи новый WS URL → SAVE. |
-| Внизу `0 ms` латенси не меняется | Связь висит | Обнови страницу `Ctrl+R`. |
-| Цифры замёрзли, не двигаются | Сервер упал | Пилот должен перезапустить `server.py`. |
-| Карта пустая | Пилот только что выехал | Подожди круг, нарисуется. |
+| Yellow modal **AWAITING TELEMETRY** | Driver in garage / menu / loading | Normal, wait. If > 5 minutes — ask the driver. |
+| Red modal **AWAITING SERVER** | No link to the driver's server | Ask the driver — is their cloudflared/ngrok window alive? Possibly restart. |
+| Red **CANNOT REACH SERVER** | URL is stale (driver restarted tunnel) | Click ⚙ → enter new WS URL → SAVE. |
+| Latency stuck at `0 ms` | Connection frozen | Refresh: `Ctrl+R`. |
+| Digits frozen, not changing | Server crashed | Driver must restart `server.py`. |
+| Map empty | Driver just went on track | Wait one lap, it will draw itself. |
 
 ---
 
-## Полезные хоткеи
+## Hotkeys
 
-| Клавиша | Действие |
+| Key | Action |
 |---|---|
-| **F11** | Полноэкранный режим / выход |
-| **Ctrl+R** | Перезагрузить страницу |
-| **Ctrl+Shift+R** | Жёсткая перезагрузка (если что-то отображается криво) |
-| **Esc** | Закрыть любую модалку |
-| Кнопка **⚙ CONNECTION** внизу | Настроить WS URL |
-| Кнопка **?** внизу | Открыть эту справку прямо в дашборде |
+| **F11** | Toggle full-screen |
+| **Ctrl + R** | Reload the page |
+| **Ctrl + Shift + R** | Hard reload (if the UI looks broken) |
+| **Esc** | Close any modal |
+| **?** | Open this guide |
+| **⚙ CONNECTION** (footer button) | Set WS URL |
+| **? GUIDE** (footer button) | Open this guide |
 
 ---
 
-## Что записывать (бумажный пит-журнал)
+## What to write down (paper pit journal)
 
-Дашборд показывает живые данные, но историю кругов не хранит. Хороший стратег ведёт лист параллельно:
+The dashboard shows live data but does not store history. A good strategist also logs by hand:
 
-| LAP | LAP TIME | FUEL после круга | TIRE TEMP avg | NOTES |
-|----:|:--------:|:-----------------:|:-------------:|:------|
-|  47 | 3:31.124 |       72.4 L      |    92 °C      | First lap of stint |
-|  48 | 3:30.612 |       69.8 L      |    96 °C      | Sector 2 +0.3 vs best |
-|  49 | 3:30.998 |       67.2 L      |    98 °C      | Yellow at Tertre |
+| LAP | LAP TIME | FUEL after lap | TIRE TEMP avg | NOTES |
+|----:|:--------:|:---------------:|:-------------:|:------|
+|  47 | 3:31.124 |      72.4 L     |     92 °C     | First lap of stint |
+|  48 | 3:30.612 |      69.8 L     |     96 °C     | Sector 2 +0.3 vs best |
+|  49 | 3:30.998 |      67.2 L     |     98 °C     | Yellow at Tertre |
 
-Это даст понимание тренда на следующих стинтах и сменах резины.
+This gives you a sense of stint trend across upcoming stints and tire changes.
 
 ---
 
-Удачи на трассе!
+Good luck out there!
 
 — LMU Pit Wall
