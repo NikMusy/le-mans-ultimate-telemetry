@@ -39,15 +39,28 @@ html, body {
     display: grid;
     width: 100%;
     height: 100%;
-    grid-template-columns: minmax(520px, 1.35fr) minmax(380px, 1fr) minmax(420px, 1.05fr);
+    grid-template-columns: minmax(480px, 1.2fr) minmax(360px, 0.95fr) minmax(380px, 1fr) minmax(340px, 0.95fr);
     grid-template-rows: 32px 1fr 24px;
     grid-template-areas:
-        "header header header"
-        "vitals center timing"
-        "footer footer footer";
+        "header header header header"
+        "vitals center timing field"
+        "footer footer footer footer";
     gap: 2px;
     background: #1a1a1a;
     padding: 2px;
+}
+
+/* When the screen is narrow, drop the 4th column under the others */
+@media (max-width: 1500px) {
+    .app {
+        grid-template-columns: minmax(460px, 1.2fr) minmax(340px, 1fr) minmax(380px, 1.05fr);
+        grid-template-rows: 32px 1fr 220px 24px;
+        grid-template-areas:
+            "header header header"
+            "vitals center timing"
+            "field  field  field"
+            "footer footer footer";
+    }
 }
 
 /* ============================================================
@@ -764,6 +777,206 @@ html, body {
 .gap-cell .v.neg { color: #00ff66; }
 .gap-cell .v.pos { color: #ff7070; }
 
+/* ============================================================
+   4th column: MULTICLASS + TRACK MAP
+   ============================================================ */
+.field {
+    grid-area: field;
+    display: grid;
+    grid-template-rows: 1.4fr 1fr;
+    gap: 2px;
+    min-height: 0;
+}
+
+@media (max-width: 1500px) {
+    .field {
+        grid-template-rows: 1fr;
+        grid-template-columns: 1.4fr 1fr;
+        gap: 2px;
+    }
+}
+
+.classes-panel {
+    background: #0a0a0a;
+    border: 1px solid #2a2a2a;
+    display: grid;
+    grid-template-rows: 22px 1fr;
+    overflow: hidden;
+    min-height: 0;
+}
+.classes-panel > .ttl {
+    background: #161616;
+    color: #8a8a8a;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    padding: 0 10px;
+    border-bottom: 1px solid #2a2a2a;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-transform: uppercase;
+}
+.classes-body {
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: #2a2a2a transparent;
+}
+.classes-body::-webkit-scrollbar { width: 6px; }
+.classes-body::-webkit-scrollbar-track { background: transparent; }
+.classes-body::-webkit-scrollbar-thumb { background: #2a2a2a; }
+
+.cls-group { }
+.cls-header {
+    background: #131313;
+    color: #fff;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    padding: 5px 8px;
+    border-bottom: 1px solid #1a1a1a;
+    border-top: 1px solid #2a2a2a;
+    display: grid;
+    grid-template-columns: 4px 1fr auto;
+    align-items: center;
+    gap: 6px;
+    text-transform: uppercase;
+}
+.cls-header:first-child { border-top: none; }
+.cls-header .swatch {
+    width: 4px;
+    height: 14px;
+    background: #888;
+}
+.cls-header .cars-count {
+    color: #5a5a5a;
+    letter-spacing: 0.12em;
+    font-size: 10px;
+}
+
+.cls-row {
+    display: grid;
+    grid-template-columns: 4px 22px 18px 1fr 50px;
+    gap: 4px;
+    align-items: center;
+    padding: 3px 8px 3px 0;
+    font-size: 11px;
+    border-bottom: 1px solid #111;
+    color: #c4c4c4;
+}
+.cls-row .swatch {
+    width: 4px;
+    height: 100%;
+    background: #888;
+    min-height: 18px;
+}
+.cls-row .p {
+    color: #fff;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-size: 12px;
+}
+.cls-row .pc {
+    color: #6a6a6a;
+    text-align: right;
+    font-size: 10px;
+    font-variant-numeric: tabular-nums;
+}
+.cls-row .drv {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    letter-spacing: 0;
+}
+.cls-row .gap {
+    color: #8a8a8a;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-size: 11px;
+}
+.cls-row.player {
+    background: rgba(0, 217, 255, 0.10);
+    color: #fff;
+}
+.cls-row.player .p { color: #00d9ff; }
+.cls-row.player .drv { color: #00d9ff; font-weight: bold; }
+.cls-row.pit .drv:after {
+    content: ' PIT';
+    color: #ffd700;
+    font-size: 9px;
+    margin-left: 6px;
+    letter-spacing: 0.1em;
+}
+
+/* track map */
+.map-panel {
+    background: #0a0a0a;
+    border: 1px solid #2a2a2a;
+    display: grid;
+    grid-template-rows: 22px 1fr;
+    overflow: hidden;
+    min-height: 0;
+}
+.map-panel > .ttl {
+    background: #161616;
+    color: #8a8a8a;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    padding: 0 10px;
+    border-bottom: 1px solid #2a2a2a;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-transform: uppercase;
+}
+.map-panel > .ttl .right { color: #5a5a5a; letter-spacing: 0.14em; }
+.map-wrap {
+    position: relative;
+    background: #050505;
+    min-height: 0;
+    overflow: hidden;
+}
+#track-map {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+.map-legend {
+    position: absolute;
+    left: 6px;
+    bottom: 6px;
+    display: grid;
+    gap: 2px;
+    font-size: 9px;
+    color: #6a6a6a;
+    letter-spacing: 0.1em;
+    pointer-events: none;
+    text-transform: uppercase;
+}
+.map-legend .leg {
+    display: grid;
+    grid-template-columns: 8px auto;
+    gap: 4px;
+    align-items: center;
+}
+.map-legend .dot {
+    width: 8px;
+    height: 8px;
+    background: #888;
+}
+.map-progress {
+    position: absolute;
+    right: 6px;
+    bottom: 6px;
+    font-size: 10px;
+    color: #8a8a8a;
+    letter-spacing: 0.1em;
+    font-variant-numeric: tabular-nums;
+    pointer-events: none;
+}
+.map-progress b { color: #00d9ff; }
+
 /* Flag strip */
 .flag-strip {
     background: #0a0a0a;
@@ -1273,6 +1486,38 @@ html, body {
 
     </div>
 
+    <!-- ====================== FIELD (multiclass + map) ====================== -->
+    <div class="field">
+
+        <div class="classes-panel">
+            <div class="ttl">
+                <span>CLASSES</span>
+                <span class="right" id="field-count">0 CARS</span>
+            </div>
+            <div class="classes-body" id="classes-body">
+                <!-- groups rendered by JS -->
+            </div>
+        </div>
+
+        <div class="map-panel">
+            <div class="ttl">
+                <span>TRACK MAP</span>
+                <span class="right" id="map-info">—</span>
+            </div>
+            <div class="map-wrap">
+                <canvas id="track-map"></canvas>
+                <div class="map-legend" id="map-legend">
+                    <div class="leg"><span class="dot" style="background:#ff3030"></span>HYPERCAR</div>
+                    <div class="leg"><span class="dot" style="background:#0080ff"></span>LMP2</div>
+                    <div class="leg"><span class="dot" style="background:#ffd700"></span>LMGT3</div>
+                    <div class="leg"><span class="dot" style="background:#00d9ff"></span>PLAYER</div>
+                </div>
+                <div class="map-progress" id="map-progress">LAP <b>—</b>%</div>
+            </div>
+        </div>
+
+    </div>
+
     <!-- ====================== FOOTER ====================== -->
     <div class="footer" id="footer">
         <span class="conn"><span class="led"></span><span id="conn-state">DISCONNECTED</span></span>
@@ -1581,6 +1826,293 @@ function fuelPerLap() {
 }
 
 // ============================================================
+// Multiclass colour mapping + class detection
+// ============================================================
+const CLASS_COLOR_RULES = [
+    // [substring (uppercased), color]
+    ['HYPERCAR', '#ff3030'],
+    ['LMH',      '#ff3030'],
+    ['LMDH',     '#ff3030'],
+    ['LMP1',     '#ff7000'],
+    ['LMP2',     '#0080ff'],
+    ['LMP3',     '#5fb0ff'],
+    ['LMGT3',    '#ffd700'],
+    ['GT3',      '#ffd700'],
+    ['GTE',      '#ffae00'],
+    ['GT4',      '#aaaaaa'],
+];
+function classColor(name) {
+    if (!name) return '#888';
+    const u = name.toUpperCase();
+    for (const [needle, color] of CLASS_COLOR_RULES) {
+        if (u.includes(needle)) return color;
+    }
+    return '#888';
+}
+const CLASS_ORDER = ['HYPERCAR', 'LMH', 'LMDH', 'LMP1', 'LMP2', 'LMP3',
+                     'LMGT3', 'GT3', 'GTE', 'GT4'];
+function classSortKey(name) {
+    if (!name) return 999;
+    const u = name.toUpperCase();
+    for (let i = 0; i < CLASS_ORDER.length; i++) {
+        if (u.includes(CLASS_ORDER[i])) return i;
+    }
+    return 998;
+}
+
+function escapeHtml(s) {
+    if (s == null) return '';
+    return String(s).replace(/[&<>"']/g, c =>
+        ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// ============================================================
+// Multiclass standings table
+// ============================================================
+function renderClasses(field) {
+    const body = $('classes-body');
+    if (!field || field.length === 0) {
+        if (body._lastHtml !== '') {
+            body.innerHTML = '';
+            body._lastHtml = '';
+        }
+        setText('field-count', '0 CARS');
+        return;
+    }
+    setText('field-count', `${field.length} CARS`);
+
+    // Bucket by class
+    const groups = new Map();
+    for (const car of field) {
+        const cls = car.vehicle_class || '—';
+        if (!groups.has(cls)) groups.set(cls, []);
+        groups.get(cls).push(car);
+    }
+    const sortedClasses = Array.from(groups.keys()).sort(
+        (a, b) => classSortKey(a) - classSortKey(b));
+
+    let html = '';
+    for (const cls of sortedClasses) {
+        const cars = groups.get(cls);
+        cars.sort((a, b) => (a.place_class || 999) - (b.place_class || 999));
+        const color = classColor(cls);
+        html += `<div class="cls-group">
+            <div class="cls-header">
+                <div class="swatch" style="background:${color}"></div>
+                <div>${escapeHtml(cls)}</div>
+                <div class="cars-count">${cars.length} CAR${cars.length !== 1 ? 'S' : ''}</div>
+            </div>`;
+        for (const car of cars) {
+            const isPlayer = car.is_player ? ' player' : '';
+            const pit      = car.in_pits   ? ' pit'    : '';
+            const driver   = escapeHtml((car.driver || '—').slice(0, 16));
+            let gapTxt;
+            if (car.place_class === 1) {
+                gapTxt = car.is_player ? 'P1' : 'LEAD';
+            } else if (car.behind_leader != null) {
+                if (car.laps_behind_leader > 0) {
+                    gapTxt = `+${car.laps_behind_leader}L`;
+                } else {
+                    gapTxt = `+${car.behind_leader.toFixed(1)}`;
+                }
+            } else {
+                gapTxt = '—';
+            }
+            html += `<div class="cls-row${isPlayer}${pit}">
+                <div class="swatch" style="background:${color}"></div>
+                <div class="p">${car.place || '—'}</div>
+                <div class="pc">P${car.place_class || '?'}</div>
+                <div class="drv">${driver}</div>
+                <div class="gap">${gapTxt}</div>
+            </div>`;
+        }
+        html += '</div>';
+    }
+    if (body._lastHtml !== html) {
+        body.innerHTML = html;
+        body._lastHtml = html;
+    }
+}
+
+// ============================================================
+// Track map — accumulates player coordinates into a trail
+// and overlays every car coloured by its class.
+// ============================================================
+const mapState = {
+    trail: [],          // {x, z}
+    maxTrail: 12000,    // ~4 min at 50 Hz; enough to outline most tracks
+    lastPlayerLap: -1,
+};
+function pushTrail(x, z) {
+    const a = mapState.trail;
+    // Skip if duplicate of last point (stationary car)
+    if (a.length > 0) {
+        const last = a[a.length - 1];
+        if (Math.abs(last.x - x) < 0.5 && Math.abs(last.z - z) < 0.5) return;
+    }
+    a.push({x, z});
+    if (a.length > mapState.maxTrail) a.splice(0, a.length - mapState.maxTrail);
+}
+function computeBounds(points) {
+    if (points.length < 2) return null;
+    let minX = Infinity, maxX = -Infinity;
+    let minZ = Infinity, maxZ = -Infinity;
+    for (const p of points) {
+        if (p.x < minX) minX = p.x;
+        if (p.x > maxX) maxX = p.x;
+        if (p.z < minZ) minZ = p.z;
+        if (p.z > maxZ) maxZ = p.z;
+    }
+    return {
+        minX, maxX, minZ, maxZ,
+        cx: (minX + maxX) / 2,
+        cz: (minZ + maxZ) / 2,
+        rangeX: Math.max(maxX - minX, 1),
+        rangeZ: Math.max(maxZ - minZ, 1),
+    };
+}
+function getMapCtx() {
+    const canvas = $('track-map');
+    if (!canvas) return null;
+    const dpr = window.devicePixelRatio || 1;
+    const w = canvas.clientWidth;
+    const h = canvas.clientHeight;
+    if (w === 0 || h === 0) return null;
+    const targetW = Math.round(w * dpr);
+    const targetH = Math.round(h * dpr);
+    if (canvas.width !== targetW || canvas.height !== targetH) {
+        canvas.width = targetW;
+        canvas.height = targetH;
+    }
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return { ctx, w, h };
+}
+function renderMap(snap) {
+    // Capture player position from explicit field or from `field[]`
+    let px = null, pz = null;
+    if (snap.player_pos) {
+        px = snap.player_pos.x;
+        pz = snap.player_pos.z;
+    } else if (snap.field) {
+        const p = snap.field.find(c => c.is_player);
+        if (p) { px = p.pos_x; pz = p.pos_z; }
+    }
+    if (px != null && pz != null && isFinite(px) && isFinite(pz)) {
+        pushTrail(px, pz);
+    }
+
+    const got = getMapCtx();
+    if (!got) return;
+    const { ctx, w, h } = got;
+
+    ctx.clearRect(0, 0, w, h);
+
+    if (mapState.trail.length < 12) {
+        ctx.fillStyle = '#3a3a3a';
+        ctx.font = '10px Consolas, monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('ACQUIRING POSITION…', w / 2, h / 2);
+        ctx.fillStyle = '#222';
+        ctx.fillText(`${mapState.trail.length} samples`, w / 2, h / 2 + 14);
+        return;
+    }
+
+    const b = computeBounds(mapState.trail);
+    const pad = 18;
+    const scale = Math.min(
+        (w - pad * 2) / b.rangeX,
+        (h - pad * 2) / b.rangeZ
+    );
+    const toCanvas = (x, z) => [
+        (x - b.cx) * scale + w / 2,
+        h / 2 - (z - b.cz) * scale, // invert Z so +Z is up (north)
+    ];
+
+    // ---- Track trail (the shape) ----
+    ctx.strokeStyle = '#383838';
+    ctx.lineWidth = 2.2;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    const t = mapState.trail;
+    let [mx, my] = toCanvas(t[0].x, t[0].z);
+    ctx.moveTo(mx, my);
+    for (let i = 1; i < t.length; i++) {
+        const [cx, cy] = toCanvas(t[i].x, t[i].z);
+        ctx.lineTo(cx, cy);
+    }
+    ctx.stroke();
+
+    // ---- Cars ----
+    if (snap.field) {
+        // First draw non-player so player is on top
+        const cars = snap.field.slice().sort((a, b) => (a.is_player ? 1 : 0) - (b.is_player ? 1 : 0));
+        for (const car of cars) {
+            if (!isFinite(car.pos_x) || !isFinite(car.pos_z)) continue;
+            const [cx, cy] = toCanvas(car.pos_x, car.pos_z);
+            const baseColor = classColor(car.vehicle_class);
+
+            if (car.is_player) {
+                // crosshair-ring around player
+                ctx.strokeStyle = '#00d9ff';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.arc(cx, cy, 8, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(cx - 11, cy); ctx.lineTo(cx - 5, cy);
+                ctx.moveTo(cx + 11, cy); ctx.lineTo(cx + 5, cy);
+                ctx.moveTo(cx, cy - 11); ctx.lineTo(cx, cy - 5);
+                ctx.moveTo(cx, cy + 11); ctx.lineTo(cx, cy + 5);
+                ctx.stroke();
+                ctx.fillStyle = '#00d9ff';
+                ctx.beginPath();
+                ctx.arc(cx, cy, 4, 0, Math.PI * 2);
+                ctx.fill();
+            } else {
+                const r = 3.2;
+                ctx.fillStyle = car.in_pits ? '#5a5a5a' : baseColor;
+                ctx.beginPath();
+                ctx.arc(cx, cy, r, 0, Math.PI * 2);
+                ctx.fill();
+                if (car.in_pits) {
+                    ctx.strokeStyle = '#ffd700';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, r + 1.5, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+            }
+        }
+    }
+}
+
+function updateMapInfo(snap) {
+    const len = (snap.session && snap.session.track_length) || null;
+    setText('map-info', len ? `${(len / 1000).toFixed(2)} KM · ${mapState.trail.length} PT` : `${mapState.trail.length} PT`);
+    let lapProg = null;
+    if (len && snap.field) {
+        const p = snap.field.find(c => c.is_player);
+        if (p) lapProg = Math.max(0, Math.min(100, (p.lap_dist / len) * 100));
+    }
+    const el = $('map-progress');
+    if (el) el.innerHTML = lapProg != null && isFinite(lapProg)
+        ? `LAP <b>${lapProg.toFixed(1)}</b>%`
+        : 'LAP <b>—</b>%';
+}
+
+let _lastFieldRenderAt = -1;
+function maybeRenderField(snap) {
+    if (!snap || lastMsgAt === _lastFieldRenderAt) return;
+    _lastFieldRenderAt = lastMsgAt;
+    renderClasses(snap.field || []);
+    renderMap(snap);
+    updateMapInfo(snap);
+}
+
+// ============================================================
 // Render pass — called every frame from rAF
 // ============================================================
 function render() {
@@ -1852,6 +2384,9 @@ function render() {
     setClassToggle('fl-spd',  'on', !!s.speed_limiter);
     const ovh = (s.water_temp || 0) > 110 || (s.oil_temp || 0) > 130;
     setClassToggle('fl-ovh',  'on', ovh);
+
+    // ---- Multiclass field + track map (only on new data) ----
+    maybeRenderField(s);
 
     requestAnimationFrame(render);
 }

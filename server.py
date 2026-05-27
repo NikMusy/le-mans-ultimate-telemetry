@@ -557,7 +557,50 @@ def build_snapshot(telemetry, scoring) -> dict:
             "player_name":    _bytes_to_str(si.mPlayerName),
             "game_phase":     int(si.mGamePhase),
             "yellow_state":   int(si.mYellowFlagState),
+            "track_length":   float(si.mLapDist),
         }
+
+        # ---------------------------------------------------------
+        # Full field — every car in the session, used by the
+        # multiclass table and the track map.
+        # ---------------------------------------------------------
+        field = []
+        n = min(si.mNumVehicles, MAX_MAPPED_VEHICLES)
+        for i in range(n):
+            vs = scoring.mVehicles[i]
+            field.append({
+                "id":                  int(vs.mID),
+                "place":               int(vs.mPlace),
+                "driver":              _bytes_to_str(vs.mDriverName),
+                "vehicle":             _bytes_to_str(vs.mVehicleName),
+                "vehicle_class":       _bytes_to_str(vs.mVehicleClass),
+                "total_laps":          int(vs.mTotalLaps),
+                "lap_dist":            float(vs.mLapDist),
+                "behind_next":         float(vs.mTimeBehindNext),
+                "behind_leader":       float(vs.mTimeBehindLeader),
+                "laps_behind_leader":  int(vs.mLapsBehindLeader),
+                "in_pits":             bool(vs.mInPits),
+                "in_garage":           bool(vs.mInGarageStall),
+                "is_player":           bool(vs.mIsPlayer),
+                "last_lap":            float(vs.mLastLapTime) if vs.mLastLapTime > 0 else None,
+                "best_lap":            float(vs.mBestLapTime) if vs.mBestLapTime > 0 else None,
+                "pos_x":               float(vs.mPos.x),
+                "pos_y":               float(vs.mPos.y),
+                "pos_z":               float(vs.mPos.z),
+                "sector":              (int(vs.mSector) + 1) if vs.mSector >= 0 else 1,
+                "pit_state":           int(vs.mPitState),
+            })
+
+        # Compute place_in_class for each car (1-based, by overall place).
+        by_class = {}
+        for car in field:
+            by_class.setdefault(car["vehicle_class"], []).append(car)
+        for cls_cars in by_class.values():
+            cls_cars.sort(key=lambda c: c["place"] if c["place"] > 0 else 999)
+            for idx, c in enumerate(cls_cars, 1):
+                c["place_class"] = idx
+
+        out["field"] = field
 
     return out
 
@@ -565,6 +608,91 @@ def build_snapshot(telemetry, scoring) -> dict:
 # ============================================================
 # Demo data (no LMU required)
 # ============================================================
+
+def _demo_track_xz(phase: float):
+    """Synthetic Le Mans-ish racetrack outline (top-down x/z in meters)."""
+    a = phase * 2.0 * math.pi
+    x = math.cos(a) * 2200.0 + math.sin(a * 2.0) * 350.0 + math.cos(a * 5.0) * 90.0
+    z = math.sin(a) * 1300.0 + math.cos(a * 3.0) * 240.0 - math.sin(a * 7.0) * 60.0
+    return x, z
+
+
+_DEMO_TRACK_LENGTH = 13626.0  # ~Sarthe
+
+
+def _demo_field(t: float) -> list:
+    """15-car synthetic multiclass grid (6 Hypercar / 4 LMP2 / 5 LMGT3)."""
+    classes_def = [
+        # (name, count, avg lap time)
+        ("Hypercar", 6, 210.0),
+        ("LMP2",     4, 222.0),
+        ("LMGT3",    5, 240.0),
+    ]
+    player_cls = "Hypercar"
+    player_idx_in_class = 2  # 3rd Hypercar
+
+    field = []
+    car_id = 1
+    for cls_idx, (cls_name, count, cls_lap_t) in enumerate(classes_def):
+        for i in range(count):
+            # Stagger phases so cars are spread around the track
+            base_phase = (cls_idx * 0.11 + i * 0.073)
+            phase = (base_phase + t / cls_lap_t) % 1.0
+            x, z = _demo_track_xz(phase)
+            is_player = (cls_name == player_cls and i == player_idx_in_class)
+            total_laps = int((t + base_phase * cls_lap_t) / cls_lap_t)
+            field.append({
+                "id":               car_id,
+                "place":            0,  # filled in below
+                "place_class":      0,
+                "driver":           "OUR DRIVER" if is_player else f"DRV {car_id:02d}",
+                "vehicle":          f"{cls_name} #{car_id:02d}",
+                "vehicle_class":    cls_name,
+                "total_laps":       total_laps,
+                "lap_dist":         phase * _DEMO_TRACK_LENGTH,
+                "behind_next":      0.0,
+                "behind_leader":    0.0,
+                "laps_behind_leader": 0,
+                "in_pits":          False,
+                "in_garage":        False,
+                "is_player":        is_player,
+                "last_lap":         cls_lap_t + (i * 0.42),
+                "best_lap":         cls_lap_t - 1.8 + (i * 0.25),
+                "pos_x":            x,
+                "pos_y":            0.0,
+                "pos_z":            z,
+                "sector":           1 + int(phase * 3),
+                "pit_state":        0,
+            })
+            car_id += 1
+
+    # Overall standings by total progress
+    field.sort(
+        key=lambda c: c["total_laps"] * _DEMO_TRACK_LENGTH + c["lap_dist"],
+        reverse=True,
+    )
+    leader_dist = field[0]["total_laps"] * _DEMO_TRACK_LENGTH + field[0]["lap_dist"]
+    for place, car in enumerate(field, 1):
+        car["place"] = place
+        car_dist = car["total_laps"] * _DEMO_TRACK_LENGTH + car["lap_dist"]
+        speed_for_class = {"Hypercar": 65.0, "LMP2": 60.0, "LMGT3": 50.0}.get(
+            car["vehicle_class"], 60.0)
+        car["behind_leader"] = (leader_dist - car_dist) / speed_for_class
+        if place > 1:
+            prev_car = field[place - 2]
+            prev_dist = prev_car["total_laps"] * _DEMO_TRACK_LENGTH + prev_car["lap_dist"]
+            car["behind_next"] = (prev_dist - car_dist) / speed_for_class
+
+    # Per-class standings
+    by_class = {}
+    for car in field:
+        by_class.setdefault(car["vehicle_class"], []).append(car)
+    for cls_cars in by_class.values():
+        for idx, c in enumerate(cls_cars, 1):
+            c["place_class"] = idx
+
+    return field
+
 
 def demo_snapshot(t: float) -> dict:
     lap_time = 210.0
@@ -599,6 +727,11 @@ def demo_snapshot(t: float) -> dict:
         cur_s1 = 52.8 + (math.sin(t * 0.13) * 0.4)
     if lap_prog > 0.66:
         cur_s2 = 74.2 + (math.sin(t * 0.11) * 0.5)
+
+    # Generate full multiclass field once per snapshot
+    field = _demo_field(t)
+    player_car = next((c for c in field if c["is_player"]), field[0])
+    player_x, player_z = player_car["pos_x"], player_car["pos_z"]
 
     return {
         "status":       "live",
@@ -641,7 +774,7 @@ def demo_snapshot(t: float) -> dict:
         },
 
         "timing": {
-            "place":         3,
+            "place":         player_car["place"],
             "total_laps":    lap_n,
             "current_sector": 1 + int(lap_prog * 3),
             "in_pits":       lap_prog > 0.97,
@@ -662,10 +795,10 @@ def demo_snapshot(t: float) -> dict:
             "last_s3":       82.545,
             "best_s1":       52.812,
             "best_s2":       73.998,
-            "behind_next":   0.342,
-            "behind_leader": 12.456,
+            "behind_next":   player_car["behind_next"],
+            "behind_leader": player_car["behind_leader"],
             "laps_behind_leader": 0,
-            "driver":        "DEMO DRIVER",
+            "driver":        "OUR DRIVER",
             "vehicle_class": "Hypercar",
         },
         "session": {
@@ -677,11 +810,16 @@ def demo_snapshot(t: float) -> dict:
             "ambient_temp": 22.0,
             "track_temp":   28.5,
             "raining":      0.0,
-            "num_vehicles": 47,
-            "player_name":  "DEMO DRIVER",
+            "num_vehicles": len(field),
+            "player_name":  "OUR DRIVER",
             "game_phase":   5,
             "yellow_state": 0,
-        }
+            "track_length": _DEMO_TRACK_LENGTH,
+        },
+        "field": field,
+        # Tell the client the player's current XZ explicitly so the map
+        # doesn't have to find them.
+        "player_pos": {"x": player_x, "z": player_z},
     }
 
 
