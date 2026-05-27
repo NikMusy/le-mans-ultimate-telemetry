@@ -1,0 +1,15 @@
+{
+  "name": "lmu-pitwall",
+  "version": "1.0.0",
+  "private": true,
+  "description": "WEC-style real-time telemetry dashboard for Le Mans Ultimate (rFactor 2). Frontend hosted on Cloudflare Pages; backend runs locally on the racing PC and is tunnelled out with ngrok.",
+  "scripts": {
+    "deploy": "wrangler pages deploy static --project-name=lmu-pitwall --branch=main --commit-dirty=true",
+    "deploy:preview": "wrangler pages deploy static --project-name=lmu-pitwall --branch=preview --commit-dirty=true",
+    "tail": "wrangler pages deployment tail --project-name=lmu-pitwall",
+    "list": "wrangler pages deployment list --project-name=lmu-pitwall"
+  },
+  "devDependencies": {
+    "wrangler": "^4.95.0"
+  }
+}

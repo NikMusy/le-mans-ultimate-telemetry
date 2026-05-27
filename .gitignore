@@ -40,3 +40,9 @@ desktop.ini
 # ngrok artifacts
 ngrok.yml
 *.ngrok
+
+# Node / wrangler
+node_modules/
+.wrangler/
+.dev.vars
+package-lock.json
