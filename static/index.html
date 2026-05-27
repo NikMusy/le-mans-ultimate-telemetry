@@ -841,6 +841,165 @@ html, body {
     letter-spacing: 0.18em;
     margin-top: 8px;
 }
+.overlay .hint-link {
+    color: #00d9ff;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    margin-top: 14px;
+    cursor: pointer;
+    border: 1px solid #00d9ff;
+    padding: 8px 18px;
+    background: transparent;
+    font-family: inherit;
+    text-transform: uppercase;
+}
+.overlay .hint-link:hover { background: #00d9ff; color: #000; }
+
+/* ============================================================
+   Settings button + modal
+   ============================================================ */
+.settings-btn {
+    background: transparent;
+    border: 1px solid #2a2a2a;
+    color: #6a6a6a;
+    font-family: inherit;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    padding: 2px 8px;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+.settings-btn:hover { color: #00d9ff; border-color: #00d9ff; }
+
+.settings-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.88);
+    display: none;
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+}
+.settings-overlay.show { display: flex; }
+
+.settings-panel {
+    background: #0a0a0a;
+    border: 1px solid #2a2a2a;
+    width: 560px;
+    max-width: 92vw;
+    padding: 0;
+    display: grid;
+    grid-template-rows: 32px auto auto auto auto;
+    font-size: 12px;
+}
+.settings-panel .ttl {
+    background: #161616;
+    color: #fff;
+    font-size: 11px;
+    letter-spacing: 0.28em;
+    padding: 0 14px;
+    border-bottom: 1px solid #2a2a2a;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-transform: uppercase;
+}
+.settings-panel .ttl .x {
+    color: #6a6a6a;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 32px;
+}
+.settings-panel .ttl .x:hover { color: #ff3030; }
+
+.settings-panel .field {
+    padding: 16px 18px 4px;
+    display: grid;
+    gap: 6px;
+}
+.settings-panel .field label {
+    color: #8a8a8a;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+}
+.settings-panel .field input {
+    background: #000;
+    border: 1px solid #2a2a2a;
+    color: #00d9ff;
+    font-family: inherit;
+    font-size: 14px;
+    padding: 8px 10px;
+    outline: none;
+    letter-spacing: 0;
+}
+.settings-panel .field input:focus { border-color: #00d9ff; }
+
+.settings-panel .hint {
+    color: #6a6a6a;
+    font-size: 11px;
+    line-height: 1.5;
+    padding: 8px 18px 0;
+    letter-spacing: 0.04em;
+}
+.settings-panel .hint code {
+    background: #161616;
+    color: #ffd700;
+    padding: 1px 6px;
+    font-family: inherit;
+    font-size: 11px;
+}
+.settings-panel .hint b {
+    color: #d4d4d4;
+    font-weight: normal;
+}
+
+.settings-panel .actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 6px;
+    padding: 14px 18px 18px;
+    margin-top: 8px;
+    border-top: 1px solid #1a1a1a;
+}
+.settings-panel button.act {
+    background: transparent;
+    border: 1px solid #2a2a2a;
+    color: #d4d4d4;
+    font-family: inherit;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    padding: 10px 0;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+.settings-panel button.act:hover { background: #161616; color: #fff; }
+.settings-panel button.act.primary {
+    background: #00d9ff;
+    color: #000;
+    border-color: #00d9ff;
+    font-weight: bold;
+}
+.settings-panel button.act.primary:hover { background: #00b8d4; }
+.settings-panel button.act.danger {
+    border-color: #5a1a1a;
+    color: #ff7070;
+}
+.settings-panel button.act.danger:hover { background: #2a0a0a; }
+
+.settings-panel .current {
+    padding: 0 18px 8px;
+    color: #5a5a5a;
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+.settings-panel .current b {
+    color: #00d9ff;
+    font-weight: normal;
+    letter-spacing: 0;
+    word-break: break-all;
+}
 
 /* ============================================================
    Small screens — keep things readable
@@ -1119,6 +1278,7 @@ html, body {
         <span class="conn"><span class="led"></span><span id="conn-state">DISCONNECTED</span></span>
         <span id="conn-info">—</span>
         <span></span>
+        <button class="settings-btn" id="settings-btn">⚙ CONNECTION</button>
         <span class="ip" id="conn-ip">—</span>
         <span class="num" id="local-clock">--:--:--</span>
     </div>
@@ -1130,6 +1290,35 @@ html, body {
     <div class="pulse"></div>
     <div class="sub"  id="overlay-sub">RECONNECTING TO TELEMETRY BACKEND</div>
     <div class="meta" id="overlay-meta">— · —</div>
+    <button class="hint-link" id="overlay-settings-btn">⚙ CONFIGURE WEBSOCKET URL</button>
+</div>
+
+<div class="settings-overlay" id="settings-overlay">
+    <div class="settings-panel">
+        <div class="ttl">
+            <span>CONNECTION SETTINGS</span>
+            <span class="x" id="settings-close">×</span>
+        </div>
+        <div class="field">
+            <label>TELEMETRY WEBSOCKET URL</label>
+            <input type="text" id="ws-input" spellcheck="false" autocomplete="off"
+                   placeholder="wss://abc-123.ngrok-free.app/ws" />
+        </div>
+        <div class="current">CURRENT &nbsp; <b id="ws-current">—</b></div>
+        <div class="hint">
+            Frontend hosted away from the Python server (e.g. Cloudflare Pages, GitHub Pages, Base44)
+            needs to know where the telemetry backend is. Get the public URL from
+            <code>ngrok http 8000</code> on the racing PC and append <code>/ws</code>.<br><br>
+            <b>Example:</b> <code>wss://lmu-strat.ngrok-free.app/ws</code><br><br>
+            You can also pass it once via the query string:<br>
+            <code>?ws=wss://...ngrok-free.app/ws</code> — it'll be remembered after that.
+        </div>
+        <div class="actions">
+            <button class="act primary" id="ws-save">SAVE &amp; RECONNECT</button>
+            <button class="act danger"  id="ws-clear">USE SAME ORIGIN</button>
+            <button class="act"         id="ws-cancel">CANCEL</button>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -1257,21 +1446,60 @@ function paintLights(ratio) {
 }
 
 // ============================================================
+// WebSocket URL resolution
+// Priority: ?ws= query > localStorage > same-origin /ws fallback
+// On https origin, ws:// targets are coerced to wss:// to avoid
+// mixed-content blocks in the browser.
+// ============================================================
+const WS_STORAGE_KEY = 'lmu_ws_url';
+
+function sameOriginWs() {
+    const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+    return `${proto}://${location.host}/ws`;
+}
+function coerceWs(url) {
+    if (!url) return url;
+    if (location.protocol === 'https:' && url.startsWith('ws://')) {
+        return 'wss://' + url.slice(5);
+    }
+    return url;
+}
+function resolveWsUrl() {
+    try {
+        const qp = new URLSearchParams(location.search);
+        const fromQuery = qp.get('ws');
+        if (fromQuery) {
+            try { localStorage.setItem(WS_STORAGE_KEY, fromQuery); } catch (_) {}
+            return coerceWs(fromQuery);
+        }
+    } catch (_) {}
+    try {
+        const saved = localStorage.getItem(WS_STORAGE_KEY);
+        if (saved) return coerceWs(saved);
+    } catch (_) {}
+    return sameOriginWs();
+}
+
+// ============================================================
 // WebSocket connection w/ auto-reconnect & exponential backoff
 // ============================================================
+let wsUrl = resolveWsUrl();
 let latest = null;
 let connected = false;
 let lastMsgAt = 0;
 let ws = null;
 let reconnectTimer = null;
 let reconnectDelay = 500;
+let connectAttempts = 0;
+let lastConnectedAt = 0;
 
 function connect() {
-    const proto = location.protocol === 'https:' ? 'wss' : 'ws';
-    const url = `${proto}://${location.host}/ws`;
+    const url = wsUrl;
+    connectAttempts++;
 
     setText('conn-state', 'CONNECTING');
     setText('conn-ip', url);
+    setText('ws-current', url);
 
     try { ws = new WebSocket(url); }
     catch (e) { scheduleReconnect(); return; }
@@ -1279,6 +1507,8 @@ function connect() {
     ws.onopen = () => {
         connected = true;
         reconnectDelay = 500;
+        connectAttempts = 0;
+        lastConnectedAt = performance.now();
         $('footer').classList.add('online');
         setText('conn-state', 'CONNECTED');
     };
@@ -1373,16 +1603,29 @@ function render() {
 
     if (showOverlay) {
         if (!connected) {
-            setText('overlay-title', 'AWAITING SERVER');
-            setText('overlay-sub',   'RECONNECTING TO TELEMETRY BACKEND');
+            // Have we ever reached the server on this URL?
+            const neverConnected = lastConnectedAt === 0;
+            const probablyMisconfigured = neverConnected && connectAttempts >= 3;
+            if (probablyMisconfigured) {
+                setText('overlay-title', 'CANNOT REACH SERVER');
+                setText('overlay-sub',   'CHECK THE WEBSOCKET URL BELOW');
+            } else {
+                setText('overlay-title', 'AWAITING SERVER');
+                setText('overlay-sub',   'RECONNECTING TO TELEMETRY BACKEND');
+            }
+            setText('overlay-meta', wsUrl);
+            $('overlay-settings-btn').style.display = '';
         } else if (status === 'waiting') {
             setText('overlay-title', 'AWAITING TELEMETRY');
             setText('overlay-sub',   'START A SESSION IN LE MANS ULTIMATE');
+            setText('overlay-meta', (latest && latest.reason) || '');
+            $('overlay-settings-btn').style.display = 'none';
         } else if (status === 'error') {
             setText('overlay-title', 'TELEMETRY ERROR');
             setText('overlay-sub',   (latest && latest.reason) || 'unknown error');
+            setText('overlay-meta', '');
+            $('overlay-settings-btn').style.display = '';
         }
-        setText('overlay-meta', latest ? (latest.reason || '') : 'no data');
         requestAnimationFrame(render);
         return;
     }
@@ -1612,6 +1855,92 @@ function render() {
 
     requestAnimationFrame(render);
 }
+
+// ============================================================
+// Settings modal
+// ============================================================
+function openSettings() {
+    $('ws-input').value = (() => {
+        try { return localStorage.getItem(WS_STORAGE_KEY) || wsUrl; }
+        catch (_) { return wsUrl; }
+    })();
+    setText('ws-current', wsUrl);
+    $('settings-overlay').classList.add('show');
+    setTimeout(() => $('ws-input').focus(), 0);
+}
+function closeSettings() { $('settings-overlay').classList.remove('show'); }
+
+function saveWsUrl(rawValue) {
+    const v = (rawValue || '').trim();
+    if (!v) return;
+    if (!/^wss?:\/\//i.test(v)) {
+        alert('URL must start with ws:// or wss://');
+        return;
+    }
+    try { localStorage.setItem(WS_STORAGE_KEY, v); } catch (_) {}
+    wsUrl = coerceWs(v);
+    connectAttempts = 0;
+    lastConnectedAt = 0;
+    reconnectDelay = 500;
+    if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
+    if (ws) { try { ws.close(); } catch (_) {} ws = null; }
+    closeSettings();
+    connect();
+}
+
+function clearWsUrl() {
+    try { localStorage.removeItem(WS_STORAGE_KEY); } catch (_) {}
+    // Also strip ?ws= from current URL
+    try {
+        const u = new URL(location.href);
+        if (u.searchParams.has('ws')) {
+            u.searchParams.delete('ws');
+            history.replaceState({}, '', u.toString());
+        }
+    } catch (_) {}
+    wsUrl = sameOriginWs();
+    connectAttempts = 0;
+    lastConnectedAt = 0;
+    reconnectDelay = 500;
+    if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
+    if (ws) { try { ws.close(); } catch (_) {} ws = null; }
+    closeSettings();
+    connect();
+}
+
+$('settings-btn').addEventListener('click', openSettings);
+$('settings-close').addEventListener('click', closeSettings);
+$('ws-cancel').addEventListener('click', closeSettings);
+$('overlay-settings-btn').addEventListener('click', openSettings);
+$('ws-save').addEventListener('click', () => saveWsUrl($('ws-input').value));
+$('ws-clear').addEventListener('click', clearWsUrl);
+$('ws-input').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') saveWsUrl(e.target.value);
+    if (e.key === 'Escape') closeSettings();
+});
+$('settings-overlay').addEventListener('click', (e) => {
+    if (e.target === $('settings-overlay')) closeSettings();
+});
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && $('settings-overlay').classList.contains('show'))
+        closeSettings();
+});
+
+// Auto-open settings on first visit to a remote host when nothing's saved.
+(function maybeAutoOpenSettings() {
+    const sameOrigin = wsUrl === sameOriginWs();
+    const hasSaved = (() => {
+        try { return !!localStorage.getItem(WS_STORAGE_KEY); }
+        catch (_) { return false; }
+    })();
+    const localish = /^(127\.|localhost|0\.0\.0\.0|\[::1\])/i.test(location.hostname)
+                  || location.hostname === '';
+    if (sameOrigin && !hasSaved && !localish) {
+        // Page is served from a remote static host (e.g. *.pages.dev) but no
+        // WS target configured — same-origin /ws will 404, so prompt.
+        setTimeout(openSettings, 600);
+    }
+})();
 
 // ============================================================
 // Boot
