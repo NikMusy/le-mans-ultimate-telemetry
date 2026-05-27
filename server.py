@@ -768,7 +768,7 @@ def _banner(host: str, port: int, demo: bool, hz: int):
     line = "=" * 66
     print()
     print(line)
-    print("  LMU PIT WALL  ·  Real-time telemetry server  ·  v1.0")
+    print("  LMU PIT WALL  -  Real-time telemetry server  -  v1.0")
     print(line)
     print(f"  Mode          : {'DEMO (synthetic data)' if demo else 'LIVE (rF2 Shared Memory)'}")
     print(f"  Stream rate   : {hz} Hz")
@@ -778,14 +778,21 @@ def _banner(host: str, port: int, demo: bool, hz: int):
     print()
     print("  Remote access (strategist abroad):")
     print(f"      ngrok http {port}")
-    print("      → copy the https://*.ngrok-free.app URL into the browser")
+    print("      -> copy the https://*.ngrok-free.app URL into the browser")
     print(line)
     print()
 
 
 def main():
+    # Force UTF-8 on stdout/stderr so banner & logs work on cp1251 Windows consoles.
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+        sys.stderr.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+
     parser = argparse.ArgumentParser(
-        description="LMU Pit Wall — real-time WEC-style dashboard "
+        description="LMU Pit Wall - real-time WEC-style dashboard "
                     "for Le Mans Ultimate / rFactor 2",
     )
     parser.add_argument("--host", default=DEFAULT_HOST,
