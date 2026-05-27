@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+.eggs/
+build/
+dist/
+*.egg
+
+# Virtualenv
+.venv/
+venv/
+env/
+ENV/
+
+# IDE / editors
+.idea/
+.vscode/
+*.iml
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Logs / runtime
+*.log
+*.pid
+*.out
+
+# OS junk
+desktop.ini
+
+# Local secrets (just in case)
+.env
+.env.*
+!.env.example
+
+# ngrok artifacts
+ngrok.yml
+*.ngrok
