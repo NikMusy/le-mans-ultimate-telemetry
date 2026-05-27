@@ -114,6 +114,18 @@ https://lmu-pitwall.pages.dev/?ws=wss://your-reserved-name.ngrok-free.app/ws
 The URL is remembered in `localStorage`, so refreshes / reboots Just Work.
 A `⚙ CONNECTION` button in the footer lets them change it at any time.
 
+### For the strategist
+
+A complete operating manual lives in
+[**STRATEGIST_GUIDE.md**](STRATEGIST_GUIDE.md) (Russian). It covers the
+screen layout, tire-colour cheat sheet, lap-time colour code, 7 typical
+race scenarios and what to radio in each, troubleshooting, and a pit
+journal template. Send it to your engineer before the race.
+
+Inside the dashboard, the `? GUIDE` button (footer) opens an in-app
+condensed version of the same cheat sheet — strategist never has to leave
+the screen during a stint.
+
 ## Deployment (Cloudflare Pages)
 
 After cloning the repo:
