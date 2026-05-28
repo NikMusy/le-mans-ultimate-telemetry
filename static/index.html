@@ -1966,12 +1966,44 @@ function coerceWs(url) {
     return url;
 }
 function resolveWsUrl() {
+    // Synchronous best-guess used before the async config fetch resolves.
     try {
         const qp = new URLSearchParams(location.search);
         const fromQuery = qp.get('ws');
         if (fromQuery) {
             try { localStorage.setItem(WS_STORAGE_KEY, fromQuery); } catch (_) {}
             return coerceWs(fromQuery);
+        }
+    } catch (_) {}
+    try {
+        const saved = localStorage.getItem(WS_STORAGE_KEY);
+        if (saved) return coerceWs(saved);
+    } catch (_) {}
+    return sameOriginWs();
+}
+
+// Async resolver — adds an auto-published config layer so the strategist can
+// always use the SAME permanent page URL (lmu-pitwall.pages.dev) while the
+// supervisor on the racing PC keeps ws-config.json pointed at the live tunnel.
+// Priority:  ?ws= (explicit, this visit)  >  ws-config.json (auto)  >
+//            localStorage (manual fallback)  >  same-origin
+async function resolveWsUrlAsync() {
+    try {
+        const qp = new URLSearchParams(location.search);
+        const fromQuery = qp.get('ws');
+        if (fromQuery) {
+            try { localStorage.setItem(WS_STORAGE_KEY, fromQuery); } catch (_) {}
+            return coerceWs(fromQuery);
+        }
+    } catch (_) {}
+    // Auto config published by the supervisor (always fetched fresh)
+    try {
+        const r = await fetch('ws-config.json?t=' + Date.now(), { cache: 'no-store' });
+        if (r.ok) {
+            const cfg = await r.json();
+            if (cfg && typeof cfg.ws === 'string' && /^wss?:\/\//i.test(cfg.ws)) {
+                return coerceWs(cfg.ws);
+            }
         }
     } catch (_) {}
     try {
@@ -2753,8 +2785,28 @@ document.addEventListener('keydown', (e) => {
 // ============================================================
 // Boot
 // ============================================================
-connect();
+resolveWsUrlAsync().then(url => {
+    if (url) wsUrl = url;
+    connect();
+}).catch(() => connect());
 requestAnimationFrame(render);
+
+// Self-healing: while disconnected, periodically re-check the auto-published
+// config — the supervisor may have rotated the tunnel URL (e.g. after a PC
+// reboot). The strategist never has to touch anything.
+setInterval(async () => {
+    if (connected) return;
+    if (lastConnectedAt !== 0 && (performance.now() - lastConnectedAt) < 8000) return;
+    try {
+        const fresh = await resolveWsUrlAsync();
+        if (fresh && fresh !== wsUrl) {
+            wsUrl = fresh;
+            connectAttempts = 0;
+            reconnectDelay = 500;
+            if (ws) { try { ws.close(); } catch (_) {} ws = null; }
+        }
+    } catch (_) {}
+}, 10000);
 
 })();
 </script>
