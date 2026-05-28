@@ -46,3 +46,8 @@ node_modules/
 .wrangler/
 .dev.vars
 package-lock.json
+
+# Local diagnostics / scratch (not part of the product)
+_*.py
+_*.h
+_plugin/

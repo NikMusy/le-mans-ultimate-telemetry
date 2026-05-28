@@ -2085,8 +2085,9 @@ function fuelPerLap() {
 // Multiclass colour mapping + class detection
 // ============================================================
 const CLASS_COLOR_RULES = [
-    // [substring (uppercased), color]
-    ['HYPERCAR', '#ff3030'],
+    // [substring (uppercased), color]  — order matters, first match wins.
+    // LMU reports the top class as "Hyper" (not "Hypercar"), so match "HYPER".
+    ['HYPER',    '#ff3030'],
     ['LMH',      '#ff3030'],
     ['LMDH',     '#ff3030'],
     ['LMP1',     '#ff7000'],
@@ -2105,7 +2106,7 @@ function classColor(name) {
     }
     return '#888';
 }
-const CLASS_ORDER = ['HYPERCAR', 'LMH', 'LMDH', 'LMP1', 'LMP2', 'LMP3',
+const CLASS_ORDER = ['HYPER', 'LMH', 'LMDH', 'LMP1', 'LMP2', 'LMP3',
                      'LMGT3', 'GT3', 'GTE', 'GT4'];
 function classSortKey(name) {
     if (!name) return 999;

@@ -69,6 +69,11 @@ def hr(title: str = ""):
 # Probe
 # ============================================================
 def main():
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
     print("=" * 64)
     print("  LMU PIT WALL  -  Shared Memory diagnostics")
     print("=" * 64)

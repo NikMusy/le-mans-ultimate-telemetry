@@ -320,8 +320,11 @@ class rF2ScoringInfo(ctypes.Structure):
         ("mAvgPathWetness",      ctypes.c_double),
 
         ("mExpansion",           ctypes.c_ubyte * 200),
-        ("mPointer1",            (ctypes.c_ubyte * 8) * 8),
-        ("mPointer2",            (ctypes.c_ubyte * 8) * 8),
+        # Official header: a single x64 pointer placeholder (pointer2[8]).
+        # The mid-struct results-stream pointer is mResultsStreamPtr above.
+        # This was previously (wrongly) two 64-byte arrays, which pushed
+        # mVehicles[] 120 bytes forward and corrupted every per-car field.
+        ("mPointer2",            ctypes.c_ubyte * 8),
     ]
 
 
@@ -474,7 +477,7 @@ def build_snapshot(telemetry, scoring) -> dict:
         "fuel_capacity": float(v.mFuelCapacity) if v.mFuelCapacity > 0 else None,
         "water_temp":    float(v.mEngineWaterTemp),
         "oil_temp":      float(v.mEngineOilTemp),
-        "turbo_boost":   float(v.mTurboBoostPressure),
+        "turbo_boost":   float(v.mTurboBoostPressure) / 100000.0,  # Pa -> bar (absolute)
         "engine_torque": float(v.mEngineTorque),
 
         "throttle":      max(0.0, min(1.0, float(v.mUnfilteredThrottle))),
