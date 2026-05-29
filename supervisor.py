@@ -56,6 +56,9 @@ def find_cloudflared() -> str:
 CLOUDFLARED = find_cloudflared()
 URL_RE = re.compile(r"https://[a-z0-9-]+\.trycloudflare\.com")
 
+# Keep every child process windowless (no popping console windows on Windows).
+CREATE_NO_WINDOW = 0x08000000
+
 
 def log(msg: str):
     line = f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}  {msg}"
@@ -102,6 +105,7 @@ def publish_config(ws_url: str):
                 "npm run deploy",
                 cwd=str(ROOT), capture_output=True, text=True,
                 timeout=180, shell=True,
+                creationflags=CREATE_NO_WINDOW,
             )
             if r.returncode == 0:
                 log("Deployed ws-config to Cloudflare Pages OK")
@@ -145,6 +149,7 @@ def start_tunnel():
              "--no-autoupdate", "--protocol", "http2"],
             stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
             text=True, bufsize=1,
+            creationflags=CREATE_NO_WINDOW,
         )
     except Exception as e:
         log(f"tunnel start failed: {e}")
@@ -162,6 +167,7 @@ def start_server():
         proc = subprocess.Popen(
             [PYTHON, SERVER],
             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            creationflags=CREATE_NO_WINDOW,
         )
         state["server_proc"] = proc
     except Exception as e:
@@ -196,6 +202,7 @@ def find_lmu_pid():
         out = subprocess.run(
             ["tasklist", "/FI", f"IMAGENAME eq {LMU_IMAGE}", "/FO", "CSV", "/NH"],
             capture_output=True, text=True, timeout=10,
+            creationflags=CREATE_NO_WINDOW,
         ).stdout
         m = re.search(r'"' + re.escape(LMU_IMAGE) + r'","(\d+)"', out)
         return int(m.group(1)) if m else None
@@ -207,7 +214,8 @@ def kill_stray_tunnels():
     # Avoid duplicate tunnels if a previous supervisor left one behind.
     try:
         subprocess.run(["taskkill", "/F", "/IM", "cloudflared.exe"],
-                       capture_output=True, text=True)
+                       capture_output=True, text=True,
+                       creationflags=CREATE_NO_WINDOW)
     except Exception:
         pass
 
