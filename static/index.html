@@ -2558,6 +2558,9 @@ function applyGameClass() {
     document.querySelectorAll('#game-tabs button').forEach(b => {
         b.classList.toggle('active', b.dataset.game === currentGame);
     });
+    document.title = currentGame === 'f1'
+        ? 'RBR PIT WALL · F1 25'
+        : 'PIT WALL · LE MANS ULTIMATE';
 }
 
 function sameOriginWs() {
@@ -3055,7 +3058,10 @@ function render() {
             $('overlay-settings-btn').style.display = '';
         } else if (status === 'waiting') {
             setText('overlay-title', 'AWAITING TELEMETRY');
-            setText('overlay-sub',   'START A SESSION IN LE MANS ULTIMATE');
+            setText('overlay-sub',
+                currentGame === 'f1'
+                    ? 'START A SESSION IN F1 25'
+                    : 'START A SESSION IN LE MANS ULTIMATE');
             setText('overlay-meta', (latest && latest.reason) || '');
             $('overlay-settings-btn').style.display = 'none';
         } else if (status === 'error') {
