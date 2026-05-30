@@ -71,7 +71,7 @@ html, body {
     background: #000;
     border: 1px solid #2a2a2a;
     display: grid;
-    grid-template-columns: auto auto auto auto auto auto 1fr auto;
+    grid-template-columns: auto auto auto auto auto auto 1fr auto auto;
     align-items: center;
     padding: 0 14px;
     gap: 22px;
@@ -105,6 +105,40 @@ html, body {
     font-size: 14px;
     letter-spacing: 0.04em;
     justify-self: end;
+}
+
+/* Always-visible game switcher inside the header */
+.game-tabs {
+    display: flex;
+    gap: 0;
+    background: #0a0a0a;
+    border: 1px solid #2a2a2a;
+    overflow: hidden;
+}
+.game-tabs button {
+    background: transparent;
+    border: none;
+    border-right: 1px solid #1a1a1a;
+    color: #6a6a6a;
+    font-family: inherit;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    padding: 4px 14px;
+    cursor: pointer;
+    text-transform: uppercase;
+    line-height: 1;
+    transition: background 80ms linear, color 80ms linear;
+}
+.game-tabs button:last-child { border-right: none; }
+.game-tabs button:hover { background: #161616; color: #d4d4d4; }
+.game-tabs button.active { font-weight: bold; }
+.game-tabs button.active[data-game="lmu"] {
+    background: #ff3030;
+    color: #000;
+}
+.game-tabs button.active[data-game="f1"] {
+    background: #00d9ff;
+    color: #000;
 }
 
 .footer {
@@ -1477,13 +1511,17 @@ html, body {
 
     <!-- ====================== HEADER ====================== -->
     <div class="header">
-        <span class="brand"><span class="dot">●</span>LMU PIT WALL</span>
+        <span class="brand"><span class="dot">●</span>PIT WALL</span>
         <span class="field">CKT <b id="hdr-track">—</b></span>
         <span class="field">CAR <b id="hdr-car">—</b></span>
         <span class="field">DRV <b id="hdr-driver">—</b></span>
         <span class="field">CLS <b id="hdr-class">—</b></span>
         <span class="field">AIR <b id="hdr-amb">—</b>°C · TRK <b id="hdr-trk">—</b>°C · WET <b id="hdr-wet">—</b>%</span>
         <span></span>
+        <div class="game-tabs" id="game-tabs">
+            <button data-game="lmu" title="Le Mans Ultimate">LMU</button>
+            <button data-game="f1"  title="F1 25">F1 25</button>
+        </div>
         <span class="session-clock num" id="session-clock">00:00:00</span>
     </div>
 
@@ -2137,6 +2175,9 @@ function applyGameClass() {
     }
     const lbl = document.getElementById('game-label');
     if (lbl) lbl.textContent = currentGame === 'f1' ? 'F1 25' : 'LMU';
+    document.querySelectorAll('#game-tabs button').forEach(b => {
+        b.classList.toggle('active', b.dataset.game === currentGame);
+    });
 }
 
 function sameOriginWs() {
@@ -2996,6 +3037,9 @@ $('game-splash').addEventListener('click', (e) => {
     if (btn) pickGame(btn.dataset.game);
 });
 $('game-switch-btn').addEventListener('click', showSplash);
+document.querySelectorAll('#game-tabs button').forEach(b => {
+    b.addEventListener('click', () => pickGame(b.dataset.game));
+});
 
 // ============================================================
 // Boot
