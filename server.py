@@ -33,6 +33,7 @@ import ctypes
 import json
 import math
 import mmap
+import os
 import sys
 import time
 from pathlib import Path
@@ -58,6 +59,10 @@ KELVIN = 273.15
 DEFAULT_HOST = "0.0.0.0"
 DEFAULT_PORT = 8000
 DEFAULT_HZ   = 50
+
+# F1 25 telemetry access token. Override with the F1_TELEM_TOKEN env var
+# if you ever need to rotate it.
+F1_TOKEN = os.environ.get("F1_TELEM_TOKEN", "567Zx111")
 
 STATIC_DIR = Path(__file__).parent / "static"
 INDEX_HTML = STATIC_DIR / "index.html"
@@ -939,6 +944,18 @@ async def ws_lmu(ws: WebSocket):
 
 @app.websocket("/ws/f1")
 async def ws_f1(ws: WebSocket):
+    # Password-gated: client must pass ?token=... matching F1_TOKEN.
+    tok = ws.query_params.get("token", "")
+    if tok != F1_TOKEN:
+        # 4401 = custom "unauthorized" close code (frontend re-prompts).
+        await ws.accept()
+        try:
+            await ws.send_text(json.dumps({"status": "error",
+                                           "reason": "F1_AUTH_REQUIRED"}))
+        except Exception:
+            pass
+        await ws.close(code=4401)
+        return
     await _stream(ws, f1_snapshot, "f1")
 
 

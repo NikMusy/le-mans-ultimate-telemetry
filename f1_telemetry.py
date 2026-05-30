@@ -464,9 +464,21 @@ class F1State:
                 "rl": f_tyre("RL"),
                 "rr": f_tyre("RR"),
             },
-            "drs":           bool(t.get("drs")),
-            "ers_store":     s.get("ers_store"),
-            "fuel_laps_left": s.get("fuel_remaining_laps"),
+            "drs":               bool(t.get("drs")),
+            "drs_allowed":       bool(s.get("drs_allowed")),
+            "ers_store":         s.get("ers_store"),               # Joules
+            "ers_store_max":     4_000_000.0,                       # F1 spec capacity
+            "ers_deploy_mode":   s.get("ers_deploy_mode"),         # 0..3
+            "ers_deployed_this_lap": s.get("ers_deployed_this_lap"),
+            "front_brake_bias":  s.get("front_brake_bias"),        # %
+            "fuel_mix":          s.get("fuel_mix"),                # 0..3
+            "fuel_laps_left":    s.get("fuel_remaining_laps"),
+            "tyre_age_laps":     s.get("tyre_age_laps"),
+            "visual_compound":   VISUAL_TYRE_COMPOUND.get(
+                                    s.get("visual_tyre_compound"), "—"),
+            "actual_compound":   ACTUAL_TYRE_COMPOUND.get(
+                                    s.get("actual_tyre_compound"), "—"),
+            "rev_lights_pct":    t.get("rev_lights_pct"),
         }
 
         # Timing
@@ -678,9 +690,19 @@ def demo_snapshot(t: float) -> dict:
             "fl": tyre(95, 480), "fr": tyre(96, 475),
             "rl": tyre(102, 420), "rr": tyre(101, 425),
         },
-        "drs":          False,
-        "ers_store":    2000000.0,
-        "fuel_laps_left": 8.0,
+        "drs":                  False,
+        "drs_allowed":          True,
+        "ers_store":            2_000_000.0 + math.sin(t * 0.15) * 800_000.0,
+        "ers_store_max":        4_000_000.0,
+        "ers_deploy_mode":      1 + int((t / 30) % 3),  # cycles modes
+        "ers_deployed_this_lap": 350_000.0,
+        "front_brake_bias":     54,
+        "fuel_mix":             1,
+        "fuel_laps_left":       8.0,
+        "tyre_age_laps":        12,
+        "visual_compound":      "MEDIUM",
+        "actual_compound":      "C3",
+        "rev_lights_pct":       int((0.5 + 0.5 * math.sin(t * 2.0)) * 100),
         "timing": {
             "place":         player["place"],
             "total_laps":    lap_n,

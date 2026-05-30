@@ -220,6 +220,14 @@ html, body {
     gap: 2px;
     min-height: 0;
 }
+/* F1 vitals: extra row for the ERS/DRS card between pedals and steering */
+.app.game-f1 .vitals {
+    grid-template-rows: 1.45fr 100px 130px 56px;
+}
+/* F1 center: extra row for the RBR setup card */
+.app.game-f1 .center {
+    grid-template-rows: 1fr 240px 110px;
+}
 
 /* GEAR + RPM bar group */
 .gear-card {
@@ -1215,10 +1223,301 @@ html, body {
     z-index: 1;
 }
 
-/* Tag the dashboard with the active game's accent */
+/* ============================================================
+   Per-game visibility utilities. Pieces of the HUD differ between
+   LMU and F1, so we tag them with .lmu-only / .f1-only and the
+   active game's class on .app reveals the right ones.
+   ============================================================ */
+.lmu-only, .f1-only { display: none !important; }
+.app.game-lmu .lmu-only,
+.app.game-f1  .f1-only { display: revert !important; }
+
+/* LMU accent (default red dot brand) */
 .app.game-lmu .header .brand .dot { color: #ff3030; }
-.app.game-f1  .header .brand .dot { color: #00d9ff; }
-.app.game-f1  .header .brand { color: #00d9ff; }
+
+/* ============================================================
+   F1 25 — Oracle Red Bull Racing theme
+   ============================================================ */
+.app.game-f1 {
+    background: #050a1f;
+}
+.app.game-f1 .header {
+    background: linear-gradient(90deg, #0a0e2a 0%, #1a2454 50%, #0a0e2a 100%);
+    border-color: #2a3672;
+}
+.app.game-f1 .header .field { color: #a8b3e0; }
+.app.game-f1 .header .field b { color: #ffd400; }
+.app.game-f1 .header .session-clock { color: #ffd400; }
+.app.game-f1 .header .brand { color: #fff; letter-spacing: 0.18em; }
+.app.game-f1 .header .brand .dot { color: #dc0000; text-shadow: 0 0 8px #dc0000; }
+
+/* Red Bull stylised wordmark inside the brand area */
+.rbr-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    line-height: 1;
+}
+.rbr-logo .rbr-bulls {
+    color: #dc0000;
+    font-size: 18px;
+    letter-spacing: -2px;
+    text-shadow: 0 0 8px rgba(220, 0, 0, 0.6);
+}
+.rbr-logo .rbr-oracle {
+    color: #ffd400;
+    font-size: 10px;
+    letter-spacing: 0.32em;
+    font-weight: bold;
+    padding: 3px 6px;
+    border: 1px solid #ffd400;
+}
+.rbr-logo .rbr-rbr {
+    color: #fff;
+    font-weight: 900;
+    font-size: 13px;
+    letter-spacing: 0.18em;
+}
+.rbr-logo .rbr-rbr .red { color: #dc0000; }
+
+/* Panels and frames */
+.app.game-f1 .panel,
+.app.game-f1 .gear-card,
+.app.game-f1 .pedals-card,
+.app.game-f1 .steer-card,
+.app.game-f1 .classes-panel,
+.app.game-f1 .map-panel,
+.app.game-f1 .position-card,
+.app.game-f1 .laptime-card,
+.app.game-f1 .sectors-card,
+.app.game-f1 .gap-card,
+.app.game-f1 .flag-strip,
+.app.game-f1 .ers-card,
+.app.game-f1 .footer,
+.app.game-f1 .tire,
+.app.game-f1 .status-card {
+    background: #0a0e2a;
+    border-color: #2a3672;
+}
+.app.game-f1 .panel > .ttl,
+.app.game-f1 .gear-card .ttl,
+.app.game-f1 .pedals-card .ttl,
+.app.game-f1 .steer-card .ttl,
+.app.game-f1 .classes-panel > .ttl,
+.app.game-f1 .map-panel > .ttl,
+.app.game-f1 .laptime-card .title,
+.app.game-f1 .sectors-card .title,
+.app.game-f1 .gap-card .title,
+.app.game-f1 .ers-card .ttl {
+    background: #131a3a;
+    color: #ffd400;
+    border-color: #2a3672;
+}
+
+/* Numbers / accents */
+.app.game-f1 .gear-value { text-shadow: 0 0 28px rgba(220, 0, 0, 0.35); }
+.app.game-f1 .speed-big,
+.app.game-f1 .gear-stage .speed-big,
+.app.game-f1 .pos-cell .v,
+.app.game-f1 .status-value,
+.app.game-f1 .laptime-grid .v.cur {
+    color: #ffd400;
+}
+.app.game-f1 .laptime-grid .v.best { color: #dc0000; }
+.app.game-f1 .sectors-table .cell.purple { color: #dc0000; }
+.app.game-f1 .gear-stage {
+    background:
+        radial-gradient(ellipse at center, rgba(220, 0, 0, 0.07) 0%, transparent 60%),
+        #050a1f;
+}
+.app.game-f1 .rpm-bar { background: #0a0e2a; border-color: #2a3672; }
+.app.game-f1 .pedal .track { background: #0a0e2a; border-color: #2a3672; }
+.app.game-f1 .pedal.thr .fill { background: linear-gradient(0deg, #b07a00 0%, #ffd400 100%); }
+.app.game-f1 .pedal.brk .fill { background: linear-gradient(0deg, #8a0000 0%, #dc0000 100%); }
+.app.game-f1 .steer-fill { background: #ffd400; box-shadow: 0 0 6px rgba(255, 212, 0, 0.4); }
+.app.game-f1 .sectors-table .cell.active {
+    background: rgba(255, 212, 0, 0.08);
+    color: #ffd400;
+}
+
+/* Active F1 tab pill in the header */
+.app.game-f1 .game-tabs button.active[data-game="f1"] {
+    background: #ffd400;
+    color: #0a0e2a;
+}
+
+/* Footer */
+.app.game-f1 .footer { color: #6e7aa8; }
+.app.game-f1 .footer.online .conn .led {
+    background: #ffd400;
+    box-shadow: 0 0 6px #ffd400;
+}
+
+/* ============================================================
+   F1-only HUD pieces
+   ============================================================ */
+.ers-card {
+    background: #0a0a0a;
+    border: 1px solid #2a2a2a;
+    display: grid;
+    grid-template-rows: 22px 1fr;
+    overflow: hidden;
+}
+.ers-card .ttl {
+    background: #161616;
+    color: #8a8a8a;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    padding: 0 10px;
+    border-bottom: 1px solid #2a2a2a;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-transform: uppercase;
+}
+.ers-body {
+    padding: 10px;
+    display: grid;
+    grid-template-rows: 22px 1fr 28px;
+    gap: 8px;
+}
+.ers-bar-wrap { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; }
+.ers-bar {
+    position: relative;
+    height: 16px;
+    background: #050a1f;
+    border: 1px solid #2a3672;
+    overflow: hidden;
+}
+.ers-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 0%;
+    background: linear-gradient(90deg, #ffd400 0%, #ff8800 50%, #dc0000 100%);
+    transition: width 80ms linear;
+}
+.ers-bar-pct {
+    font-size: 13px;
+    color: #ffd400;
+    letter-spacing: 0;
+    font-variant-numeric: tabular-nums;
+    min-width: 48px;
+    text-align: right;
+}
+.ers-modes {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 3px;
+}
+.ers-modes button, .ers-modes div {
+    background: #050a1f;
+    border: 1px solid #1a2454;
+    color: #6e7aa8;
+    font-family: inherit;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    padding: 4px 0;
+    text-align: center;
+    pointer-events: none;
+}
+.ers-modes div.active { background: #ffd400; color: #0a0e2a; border-color: #ffd400; }
+.drs-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 12px;
+    padding-top: 4px;
+}
+.drs-indicator {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    color: #6a6a6a;
+    text-align: center;
+    padding: 4px 14px;
+    font-size: 14px;
+    font-weight: 900;
+    letter-spacing: 0.3em;
+    transition: background 80ms, color 80ms, box-shadow 80ms;
+}
+.drs-indicator.armed {
+    background: #2a2400;
+    color: #ffd400;
+    border-color: #ffd400;
+}
+.drs-indicator.active {
+    background: #006400;
+    color: #00ff66;
+    border-color: #00ff66;
+    box-shadow: 0 0 12px #00ff66;
+    animation: drs-blink 0.4s steps(2) infinite;
+}
+@keyframes drs-blink {
+    50% { background: #008800; }
+}
+.drs-allow {
+    font-size: 10px;
+    color: #6e7aa8;
+    letter-spacing: 0.18em;
+}
+
+/* F1 setup card (compound + tyre age + bias + fuel mix) */
+.f1-setup-card {
+    background: #0a0a0a;
+    border: 1px solid #2a2a2a;
+    display: grid;
+    grid-template-rows: 22px 1fr;
+    overflow: hidden;
+}
+.f1-setup-card .ttl {
+    background: #161616;
+    color: #8a8a8a;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    padding: 0 10px;
+    border-bottom: 1px solid #2a2a2a;
+    text-transform: uppercase;
+}
+.f1-setup-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    padding: 6px;
+}
+.f1-setup-grid .cell {
+    background: #060606;
+    border: 1px solid #1f1f1f;
+    padding: 8px;
+    display: grid;
+    grid-template-rows: 14px 1fr;
+    gap: 4px;
+}
+.f1-setup-grid .cell .l {
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    color: #6a6a6a;
+    text-transform: uppercase;
+}
+.f1-setup-grid .cell .v {
+    font-size: 22px;
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+}
+.compound-badge {
+    display: inline-block;
+    background: #fff;
+    color: #000;
+    padding: 6px 16px;
+    font-weight: 900;
+    letter-spacing: 0.2em;
+    font-size: 20px;
+    font-family: inherit;
+}
+.compound-SOFT, .compound-C5 { background: #ff3030; color: #fff; }
+.compound-MEDIUM, .compound-C4, .compound-C3 { background: #ffd400; color: #000; }
+.compound-HARD, .compound-C2, .compound-C1, .compound-C0 { background: #f0f0f0; color: #000; }
+.compound-INTER { background: #00d900; color: #000; }
+.compound-WET { background: #00a8ff; color: #fff; }
 
 /* ============================================================
    Settings button + modal
@@ -1511,7 +1810,14 @@ html, body {
 
     <!-- ====================== HEADER ====================== -->
     <div class="header">
-        <span class="brand"><span class="dot">●</span>PIT WALL</span>
+        <span class="brand">
+            <span class="lmu-only"><span class="dot">●</span>PIT WALL</span>
+            <span class="f1-only rbr-logo">
+                <span class="rbr-bulls" aria-hidden="true">●●</span>
+                <span class="rbr-oracle">ORACLE</span>
+                <span class="rbr-rbr">RED <span class="red">BULL</span> RACING</span>
+            </span>
+        </span>
         <span class="field">CKT <b id="hdr-track">—</b></span>
         <span class="field">CAR <b id="hdr-car">—</b></span>
         <span class="field">DRV <b id="hdr-driver">—</b></span>
@@ -1566,6 +1872,26 @@ html, body {
                     <div class="lbl">CLUTCH</div>
                     <div class="track"><div class="fill" id="clt-fill"></div></div>
                     <div class="val num" id="clt-val">0%</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ers-card f1-only">
+            <div class="ttl"><span>ERS · DRS</span><span class="right" id="ers-mode-label">—</span></div>
+            <div class="ers-body">
+                <div class="ers-bar-wrap">
+                    <div class="ers-bar"><div class="ers-fill" id="ers-fill"></div></div>
+                    <div class="ers-bar-pct"><span id="ers-pct">—</span>%</div>
+                </div>
+                <div class="ers-modes" id="ers-modes">
+                    <div data-mode="0">NONE</div>
+                    <div data-mode="1">MED</div>
+                    <div data-mode="2">HOT</div>
+                    <div data-mode="3">OVER</div>
+                </div>
+                <div class="drs-row">
+                    <span class="drs-allow" id="drs-allow">DRS ZONE — IDLE</span>
+                    <span class="drs-indicator" id="drs-indicator">DRS</span>
                 </div>
             </div>
         </div>
@@ -1678,21 +2004,55 @@ html, body {
                         <div class="status-value num"><span id="fuel-val">--.-</span></div>
                         <div class="status-sub">L · <span class="num" id="fuel-pct">—</span>% · <span class="num" id="fuel-laps">— L/LAP</span></div>
                     </div>
-                    <div class="status-card" id="water-card">
+                    <div class="status-card lmu-only" id="water-card">
                         <div class="status-label">WATER</div>
                         <div class="status-value num"><span id="water-val">—</span></div>
                         <div class="status-sub">°C</div>
                     </div>
-                    <div class="status-card" id="oil-card">
+                    <div class="status-card lmu-only" id="oil-card">
                         <div class="status-label">OIL</div>
                         <div class="status-value num"><span id="oil-val">—</span></div>
                         <div class="status-sub">°C</div>
+                    </div>
+                    <div class="status-card f1-only" id="engine-card">
+                        <div class="status-label">ENGINE</div>
+                        <div class="status-value num"><span id="engine-val">—</span></div>
+                        <div class="status-sub">°C</div>
+                    </div>
+                    <div class="status-card f1-only" id="compound-card">
+                        <div class="status-label">COMPOUND</div>
+                        <div class="status-value">
+                            <span class="compound-badge" id="compound-badge">—</span>
+                        </div>
+                        <div class="status-sub"><span id="compound-age">—</span> LAPS</div>
                     </div>
                     <div class="status-card" id="stint-card">
                         <div class="status-label">STINT</div>
                         <div class="status-value num"><span id="stint-laps">—</span></div>
                         <div class="status-sub">LAPS</div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="f1-setup-card f1-only">
+            <div class="ttl">RBR SETUP</div>
+            <div class="f1-setup-grid">
+                <div class="cell">
+                    <div class="l">BRAKE BIAS</div>
+                    <div class="v"><span id="f1-bbias">—</span>%</div>
+                </div>
+                <div class="cell">
+                    <div class="l">FUEL MIX</div>
+                    <div class="v" id="f1-fuel-mix-label">—</div>
+                </div>
+                <div class="cell">
+                    <div class="l">TYRE AGE</div>
+                    <div class="v"><span id="f1-tyre-age">—</span> L</div>
+                </div>
+                <div class="cell">
+                    <div class="l">ERS THIS LAP</div>
+                    <div class="v"><span id="f1-ers-lap">—</span> kJ</div>
                 </div>
             </div>
         </div>
@@ -2144,6 +2504,21 @@ function paintLights(ratio) {
 // ============================================================
 const WS_STORAGE_KEY   = 'lmu_ws_url';
 const GAME_STORAGE_KEY = 'lmu_pitwall_game';
+const F1_TOKEN_KEY     = 'lmu_pitwall_f1_token';
+
+function getF1Token() {
+    try { return localStorage.getItem(F1_TOKEN_KEY) || ''; } catch (_) { return ''; }
+}
+function setF1Token(t) {
+    try { localStorage.setItem(F1_TOKEN_KEY, t); } catch (_) {}
+}
+function promptF1Token() {
+    const cur = getF1Token();
+    const t = prompt('F1 25 telemetry — enter password:', cur);
+    if (t === null) return false;
+    setF1Token(t.trim());
+    return true;
+}
 
 // Active game: 'lmu' or 'f1'. Priority: ?game= query > localStorage > null.
 let currentGame = (() => {
@@ -2158,11 +2533,16 @@ let currentGame = (() => {
 })();
 
 // Map the base WS URL (always ends in /ws — LMU alias) to the game-specific
-// endpoint exposed by the server: /ws (LMU) or /ws/f1.
+// endpoint exposed by the server: /ws (LMU) or /ws/f1?token=…
 function gameUrl(baseUrl) {
     if (!baseUrl) return baseUrl;
     if (currentGame === 'f1') {
-        return baseUrl.replace(/\/ws\/?$/, '/ws/f1');
+        let url = baseUrl.replace(/\/ws\/?$/, '/ws/f1');
+        const tok = getF1Token();
+        if (tok) {
+            url += (url.includes('?') ? '&' : '?') + 'token=' + encodeURIComponent(tok);
+        }
+        return url;
     }
     return baseUrl;
 }
@@ -2278,10 +2658,21 @@ function connect() {
         } catch (_) { /* ignore */ }
     };
     ws.onerror   = () => { /* close will follow */ };
-    ws.onclose   = () => {
+    ws.onclose   = (ev) => {
         connected = false;
         $('footer').classList.remove('online');
         setText('conn-state', 'DISCONNECTED');
+        if (ev && ev.code === 4401 && currentGame === 'f1') {
+            setText('conn-state', 'BAD F1 PASSWORD');
+            setF1Token('');
+            if (promptF1Token() && getF1Token()) {
+                connectAttempts = 0;
+                lastConnectedAt = 0;
+                reconnectDelay = 500;
+                setTimeout(connect, 100);
+            }
+            return;
+        }
         scheduleReconnect();
     };
 }
@@ -2900,6 +3291,59 @@ function render() {
     const ovh = (s.water_temp || 0) > 110 || (s.oil_temp || 0) > 130;
     setClassToggle('fl-ovh',  'on', ovh);
 
+    // ---- F1-only HUD: ERS gauge, DRS, compound, brake bias, fuel mix ----
+    if (currentGame === 'f1') {
+        const ersMax = s.ers_store_max || 4000000;
+        const ers = clamp(s.ers_store || 0, 0, ersMax);
+        const ersPct = Math.round((ers / ersMax) * 100);
+        setText('ers-pct', ersPct);
+        setStyle('ers-fill', 'width', `${ersPct}%`);
+
+        const modeNames = ['NONE', 'MEDIUM', 'HOTLAP', 'OVERTAKE'];
+        const modeIdx = clamp(s.ers_deploy_mode || 0, 0, 3);
+        setText('ers-mode-label', modeNames[modeIdx]);
+        document.querySelectorAll('#ers-modes [data-mode]').forEach(el => {
+            const isActive = parseInt(el.dataset.mode, 10) === modeIdx;
+            if (el.classList.contains('active') !== isActive) {
+                el.classList.toggle('active', isActive);
+            }
+        });
+
+        const drsEl = $('drs-indicator');
+        const drsOpen = !!s.drs;
+        const drsArmed = !drsOpen && !!s.drs_allowed;
+        const wantClass = drsOpen ? 'drs-indicator active'
+                        : drsArmed ? 'drs-indicator armed'
+                        : 'drs-indicator';
+        if (drsEl.className !== wantClass) drsEl.className = wantClass;
+        setText('drs-indicator', drsOpen ? 'DRS OPEN'
+                              : drsArmed ? 'DRS ARMED' : 'DRS');
+        setText('drs-allow', drsOpen ? 'OPEN — KEEP IT IN'
+                           : drsArmed ? 'DETECTION OK'
+                           : 'NOT IN ZONE');
+
+        // Engine temp (replaces water/oil in F1)
+        setText('engine-val', s.water_temp ? Math.round(s.water_temp) : '—');
+
+        // Compound badge
+        const compound = (s.actual_compound || s.visual_compound || '—').toString();
+        const badge = $('compound-badge');
+        const badgeClass = 'compound-badge compound-' + compound.replace(/\s+/g, '');
+        if (badge.className !== badgeClass) badge.className = badgeClass;
+        setText('compound-badge', compound);
+        setText('compound-age', s.tyre_age_laps != null ? s.tyre_age_laps : '—');
+
+        // Setup card
+        setText('f1-bbias', s.front_brake_bias != null ? s.front_brake_bias : '—');
+        const mixNames = ['LEAN', 'STANDARD', 'RICH', 'MAX'];
+        setText('f1-fuel-mix-label',
+            s.fuel_mix != null ? mixNames[clamp(s.fuel_mix, 0, 3)] : '—');
+        setText('f1-tyre-age', s.tyre_age_laps != null ? s.tyre_age_laps : '—');
+        setText('f1-ers-lap',
+            s.ers_deployed_this_lap != null
+                ? Math.round(s.ers_deployed_this_lap / 1000) : '—');
+    }
+
     // ---- Multiclass field + track map (only on new data) ----
     maybeRenderField(s);
 
@@ -3015,6 +3459,9 @@ function showSplash() { $('game-splash').classList.add('show'); }
 function hideSplash() { $('game-splash').classList.remove('show'); }
 function pickGame(game) {
     if (game !== 'lmu' && game !== 'f1') return;
+    if (game === 'f1' && !getF1Token()) {
+        if (!promptF1Token() || !getF1Token()) return; // cancelled or empty
+    }
     const switching = currentGame !== game;
     currentGame = game;
     try { localStorage.setItem(GAME_STORAGE_KEY, game); } catch (_) {}
