@@ -28,6 +28,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import contextlib
 import ctypes
 import json
 import math
@@ -40,6 +41,8 @@ from typing import Optional, Tuple
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse, HTMLResponse
 import uvicorn
+
+import f1_telemetry
 
 
 # ============================================================
@@ -830,15 +833,50 @@ def demo_snapshot(t: float) -> dict:
 # FastAPI app
 # ============================================================
 
-app = FastAPI(title="LMU Pit Wall", version="1.0.0")
-
 state = {
     "demo": False,
     "hz": DEFAULT_HZ,
     "tel_reader": SharedMemoryReader(TELEMETRY_SHM, rF2Telemetry),
     "sco_reader": SharedMemoryReader(SCORING_SHM, rF2Scoring),
     "boot_t": time.perf_counter(),
+    "f1_state": f1_telemetry.F1State(),
+    "f1_transport": None,
 }
+
+
+@contextlib.asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Start F1 25 UDP listener (best-effort — game may not be running yet)
+    try:
+        state["f1_transport"] = await f1_telemetry.start_listener(
+            state["f1_state"], port=f1_telemetry.DEFAULT_PORT,
+        )
+        print(f"  [F1]  UDP listener up on :{f1_telemetry.DEFAULT_PORT}", flush=True)
+    except OSError as e:
+        print(f"  [F1]  could not bind UDP :{f1_telemetry.DEFAULT_PORT}: {e}", flush=True)
+    yield
+    t = state.get("f1_transport")
+    if t is not None:
+        try: t.close()
+        except Exception: pass
+
+
+app = FastAPI(title="Pit Wall (LMU + F1)", version="2.0.0", lifespan=lifespan)
+
+
+# --- snapshot dispatch ---------------------------------------------
+def lmu_snapshot(t: float) -> dict:
+    if state["demo"]:
+        return demo_snapshot(t)
+    tel = state["tel_reader"].read()
+    sco = state["sco_reader"].read()
+    return build_snapshot(tel, sco)
+
+
+def f1_snapshot(t: float) -> dict:
+    if state["demo"]:
+        return f1_telemetry.demo_snapshot(t)
+    return state["f1_state"].snapshot()
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -857,38 +895,25 @@ async def healthz():
     return {"ok": True, "demo": state["demo"], "hz": state["hz"]}
 
 
-@app.websocket("/ws")
-async def telemetry_ws(ws: WebSocket):
+async def _stream(ws: WebSocket, snapshot_fn, label: str):
     await ws.accept()
     try:
         client = f"{ws.client.host}:{ws.client.port}" if ws.client else "?"
     except Exception:
         client = "?"
-    print(f"  [WS] connected: {client}", flush=True)
-
+    print(f"  [WS:{label}] connected: {client}", flush=True)
     period = 1.0 / max(1, state["hz"])
-    tel_r: SharedMemoryReader = state["tel_reader"]
-    sco_r: SharedMemoryReader = state["sco_reader"]
-
     try:
         while True:
             loop_t = time.perf_counter()
-
             try:
-                if state["demo"]:
-                    snap = demo_snapshot(loop_t - state["boot_t"])
-                else:
-                    tel = tel_r.read()
-                    sco = sco_r.read()
-                    snap = build_snapshot(tel, sco)
+                snap = snapshot_fn(loop_t - state["boot_t"])
             except Exception as exc:
                 snap = {"status": "error", "reason": str(exc)}
-
             try:
                 await ws.send_text(json.dumps(snap, separators=(",", ":")))
             except (WebSocketDisconnect, RuntimeError):
                 break
-
             dt = time.perf_counter() - loop_t
             sleep = period - dt
             if sleep > 0:
@@ -896,9 +921,25 @@ async def telemetry_ws(ws: WebSocket):
     except WebSocketDisconnect:
         pass
     except Exception as exc:
-        print(f"  [WS] error: {exc}", file=sys.stderr, flush=True)
+        print(f"  [WS:{label}] error: {exc}", file=sys.stderr, flush=True)
     finally:
-        print(f"  [WS] disconnected: {client}", flush=True)
+        print(f"  [WS:{label}] disconnected: {client}", flush=True)
+
+
+# /ws stays as backward-compat alias for the LMU stream
+@app.websocket("/ws")
+async def ws_default(ws: WebSocket):
+    await _stream(ws, lmu_snapshot, "lmu")
+
+
+@app.websocket("/ws/lmu")
+async def ws_lmu(ws: WebSocket):
+    await _stream(ws, lmu_snapshot, "lmu")
+
+
+@app.websocket("/ws/f1")
+async def ws_f1(ws: WebSocket):
+    await _stream(ws, f1_snapshot, "f1")
 
 
 # ============================================================

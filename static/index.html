@@ -1069,6 +1069,124 @@ html, body {
 .overlay .hint-link:hover { background: #00d9ff; color: #000; }
 
 /* ============================================================
+   Game splash screen (first-visit game picker)
+   ============================================================ */
+.game-splash {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    display: none;
+    z-index: 400;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 28px;
+    padding: 40px;
+}
+.game-splash.show { display: flex; }
+.game-splash::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse at 30% 40%, rgba(255, 48, 48, 0.10), transparent 50%),
+        radial-gradient(ellipse at 70% 60%, rgba(0, 217, 255, 0.10), transparent 50%);
+    pointer-events: none;
+}
+.game-splash .brand-line {
+    color: #fff;
+    font-size: 13px;
+    letter-spacing: 0.4em;
+    z-index: 1;
+}
+.game-splash .brand-line .dot { color: #ff3030; margin-right: 12px; }
+.game-splash .splash-title {
+    color: #fff;
+    font-size: 42px;
+    font-weight: 900;
+    letter-spacing: 0.22em;
+    text-shadow: 0 0 20px rgba(255,255,255,0.2);
+    z-index: 1;
+}
+.game-splash .splash-sub {
+    color: #6a6a6a;
+    font-size: 11px;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    z-index: 1;
+}
+.splash-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    width: 100%;
+    max-width: 780px;
+    z-index: 1;
+}
+.game-card {
+    background: #0a0a0a;
+    border: 1px solid #2a2a2a;
+    padding: 36px 28px;
+    color: #d4d4d4;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+    display: grid;
+    grid-template-rows: 18px 1fr auto;
+    gap: 16px;
+    min-height: 220px;
+    transition: border-color 100ms linear, background 100ms linear, transform 100ms linear;
+}
+.game-card:hover {
+    background: #111;
+    transform: translateY(-2px);
+}
+.game-card[data-game="lmu"]:hover { border-color: #ff3030; }
+.game-card[data-game="f1"]:hover  { border-color: #00d9ff; }
+.game-card .g-tag {
+    font-size: 10px;
+    letter-spacing: 0.28em;
+    color: #6a6a6a;
+    text-transform: uppercase;
+}
+.game-card[data-game="lmu"] .g-tag { color: #ff3030; }
+.game-card[data-game="f1"]  .g-tag { color: #00d9ff; }
+.game-card .g-name {
+    font-size: 28px;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: 0.1em;
+    line-height: 1.1;
+}
+.game-card .g-desc {
+    color: #8a8a8a;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    line-height: 1.5;
+}
+.game-card .g-desc b { color: #fff; font-weight: normal; }
+.game-card .g-hint {
+    color: #5a5a5a;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    border-top: 1px solid #1a1a1a;
+    padding-top: 12px;
+}
+.splash-meta {
+    color: #444;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    z-index: 1;
+}
+
+/* Tag the dashboard with the active game's accent */
+.app.game-lmu .header .brand .dot { color: #ff3030; }
+.app.game-f1  .header .brand .dot { color: #00d9ff; }
+.app.game-f1  .header .brand { color: #00d9ff; }
+
+/* ============================================================
    Settings button + modal
    ============================================================ */
 .settings-btn {
@@ -1651,12 +1769,46 @@ html, body {
         <span class="conn"><span class="led"></span><span id="conn-state">DISCONNECTED</span></span>
         <span id="conn-info">—</span>
         <span></span>
+        <button class="settings-btn" id="game-switch-btn" title="Switch game">🎮 <span id="game-label">LMU</span></button>
         <button class="settings-btn" id="help-btn" title="Strategist guide">? GUIDE</button>
         <button class="settings-btn" id="settings-btn">⚙ CONNECTION</button>
         <span class="ip" id="conn-ip">—</span>
         <span class="num" id="local-clock">--:--:--</span>
     </div>
 
+</div>
+
+<div class="game-splash" id="game-splash">
+    <div class="brand-line"><span class="dot">●</span>PIT WALL</div>
+    <div class="splash-title">SELECT TELEMETRY SOURCE</div>
+    <div class="splash-sub">choice is remembered in your browser</div>
+    <div class="splash-options">
+        <button class="game-card" data-game="lmu">
+            <div class="g-tag">SIM-RACING · ENDURANCE</div>
+            <div>
+                <div class="g-name">LE MANS<br>ULTIMATE</div>
+                <div class="g-desc" style="margin-top:14px">
+                    rFactor 2 engine · multi-class WEC field<br>
+                    Hypercar · LMP2 · LMGT3<br>
+                    Reads Shared Memory locally.
+                </div>
+            </div>
+            <div class="g-hint">requires SMMP plugin in &lt;LMU&gt;\Plugins\</div>
+        </button>
+        <button class="game-card" data-game="f1">
+            <div class="g-tag">SIM-RACING · FORMULA 1</div>
+            <div>
+                <div class="g-name">F1 25</div>
+                <div class="g-desc" style="margin-top:14px">
+                    EA Sports F1 series · UDP telemetry<br>
+                    20-car grid · DRS · ERS<br>
+                    Reads UDP on port 20777.
+                </div>
+            </div>
+            <div class="g-hint">enable: Settings → Telemetry → UDP On · Port 20777 · Format 2025</div>
+        </button>
+    </div>
+    <div class="splash-meta">change anytime via the 🎮 button in the footer</div>
 </div>
 
 <div class="overlay" id="overlay">
@@ -1952,7 +2104,40 @@ function paintLights(ratio) {
 // On https origin, ws:// targets are coerced to wss:// to avoid
 // mixed-content blocks in the browser.
 // ============================================================
-const WS_STORAGE_KEY = 'lmu_ws_url';
+const WS_STORAGE_KEY   = 'lmu_ws_url';
+const GAME_STORAGE_KEY = 'lmu_pitwall_game';
+
+// Active game: 'lmu' or 'f1'. Priority: ?game= query > localStorage > null.
+let currentGame = (() => {
+    try {
+        const qp = new URLSearchParams(location.search).get('game');
+        if (qp === 'lmu' || qp === 'f1') {
+            try { localStorage.setItem(GAME_STORAGE_KEY, qp); } catch (_) {}
+            return qp;
+        }
+        return localStorage.getItem(GAME_STORAGE_KEY);
+    } catch (_) { return null; }
+})();
+
+// Map the base WS URL (always ends in /ws — LMU alias) to the game-specific
+// endpoint exposed by the server: /ws (LMU) or /ws/f1.
+function gameUrl(baseUrl) {
+    if (!baseUrl) return baseUrl;
+    if (currentGame === 'f1') {
+        return baseUrl.replace(/\/ws\/?$/, '/ws/f1');
+    }
+    return baseUrl;
+}
+
+function applyGameClass() {
+    const app = document.querySelector('.app');
+    if (app) {
+        app.classList.remove('game-lmu', 'game-f1');
+        if (currentGame) app.classList.add('game-' + currentGame);
+    }
+    const lbl = document.getElementById('game-label');
+    if (lbl) lbl.textContent = currentGame === 'f1' ? 'F1 25' : 'LMU';
+}
 
 function sameOriginWs() {
     const proto = location.protocol === 'https:' ? 'wss' : 'ws';
@@ -2027,7 +2212,7 @@ let connectAttempts = 0;
 let lastConnectedAt = 0;
 
 function connect() {
-    const url = wsUrl;
+    const url = gameUrl(wsUrl);
     connectAttempts++;
 
     setText('conn-state', 'CONNECTING');
@@ -2783,12 +2968,48 @@ document.addEventListener('keydown', (e) => {
 })();
 
 // ============================================================
+// Game splash handlers
+// ============================================================
+function showSplash() { $('game-splash').classList.add('show'); }
+function hideSplash() { $('game-splash').classList.remove('show'); }
+function pickGame(game) {
+    if (game !== 'lmu' && game !== 'f1') return;
+    const switching = currentGame !== game;
+    currentGame = game;
+    try { localStorage.setItem(GAME_STORAGE_KEY, game); } catch (_) {}
+    applyGameClass();
+    hideSplash();
+    if (switching) {
+        // tear down any in-flight connection and reconnect to the new endpoint
+        connectAttempts = 0;
+        lastConnectedAt = 0;
+        reconnectDelay = 500;
+        if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
+        if (ws) { try { ws.close(); } catch (_) {} ws = null; }
+        connect();
+    } else if (!ws) {
+        connect();
+    }
+}
+$('game-splash').addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-game]');
+    if (btn) pickGame(btn.dataset.game);
+});
+$('game-switch-btn').addEventListener('click', showSplash);
+
+// ============================================================
 // Boot
 // ============================================================
+applyGameClass();
 resolveWsUrlAsync().then(url => {
     if (url) wsUrl = url;
-    connect();
-}).catch(() => connect());
+    if (!currentGame) {
+        // First visit (or cleared storage) — let the user pick a game first.
+        showSplash();
+    } else {
+        connect();
+    }
+}).catch(() => { if (currentGame) connect(); else showSplash(); });
 requestAnimationFrame(render);
 
 // Self-healing: while disconnected, periodically re-check the auto-published
